@@ -1,17 +1,15 @@
-
 spring:
-  application:
-    name: api-gateway
+    application:
+        name: api-gateway
 
-  data:
-    mongodb:
-      uri: mongodb+srv://tempuser:tempuser@cluster0.yuuhwqt.mongodb.net/healthcare
+    data:
+        mongodb:
+            uri: ${MONGO_URI}
 
 server:
-  port: 8080
-
+    port: ${GATEWAY_SERVICE_PORT}
 
 hungrycoder:
-  app:
-    jwtSecret: "======================BezKoder=Spring==========================="
-    jwtExpirationMs: 86400000
+    app:
+        jwtSecret: "======================BezKoder=Spring==========================="
+        jwtExpirationMs: 86400000

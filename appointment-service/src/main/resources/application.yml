@@ -1,10 +1,10 @@
 spring:
-  application:
-    name: appointment-service
+    application:
+        name: appointment-service
 
-  data:
-    mongodb:
-      uri: mongodb+srv://tempuser:tempuser@cluster0.yuuhwqt.mongodb.net/healthcare
+    data:
+        mongodb:
+            uri: ${MONGO_URI}
 
 server:
-  port: 8082
+    port: ${APPOINTMENT_SERVICE_PORT}

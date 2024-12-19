@@ -15,7 +15,11 @@ public class Routes {
         return GatewayRouterFunctions
                 .route("doctor_service")
                 .route(RequestPredicates.path("/doctor/**"),
-                        HandlerFunctions.http("http://localhost:8081"))
+                        /** service names are needed when run as docker containers
+                         * Can be changed back to http://localhost:8081 for local
+                         * runs and debugging
+                         */
+                        HandlerFunctions.http("http://doctor-service:8081"))
                 .build();
 
 
@@ -26,7 +30,11 @@ public class Routes {
         return GatewayRouterFunctions
                 .route("appointment_service")
                 .route(RequestPredicates.path("/appointment/**"),
-                        HandlerFunctions.http("http://localhost:8082"))
+                        /** service names are needed when run as docker containers
+                         * Can be changed back to http://localhost:8082 for local
+                         * runs and debugging
+                         */
+                        HandlerFunctions.http("http://appointment-service:8082"))
                 .build();
     }
 }

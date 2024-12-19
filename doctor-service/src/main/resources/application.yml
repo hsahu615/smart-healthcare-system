@@ -1,18 +1,17 @@
 spring:
-  application:
-    name: doctor-service
+    application:
+        name: doctor-service
 
-  data:
-    mongodb:
-      uri: mongodb+srv://tempuser:tempuser@cluster0.yuuhwqt.mongodb.net/healthcare
-
+    data:
+        mongodb:
+            uri: ${MONGO_URI}
 
 logging:
-  level:
-    org:
-      springframework:
-        web: DEBUG
-        servlet: DEBUG
+    level:
+        org:
+            springframework:
+                web: DEBUG
+                servlet: DEBUG
 
 server:
-  port: 8081
+    port: ${DOCTOR_SERVICE_PORT}
