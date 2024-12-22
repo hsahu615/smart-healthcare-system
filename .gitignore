@@ -8,9 +8,11 @@ target/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/encodings.xml
 *.iws
 *.iml
 *.ipr
+
 
 ### Eclipse ###
 .apt_generated
@@ -36,3 +38,13 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+## mongodb data volume mapping on local ##
+mongo-data/
+
+notification-service/mvnw
+
+notification-service/mvnw.cmd
+
+notification-service/.mvn/wrapper/maven-wrapper.jar
+*.xml
