@@ -1,6 +1,7 @@
 package com.hungrycoders.services;
 
 import com.hungrycoders.DTO.DoctorDTO;
+import com.hungrycoders.FeignClient.AppointmentFeignClient;
 import com.hungrycoders.exception.ResourceNotFoundException;
 import com.hungrycoders.model.Doctor;
 import com.hungrycoders.repository.DoctorRepo;
@@ -16,6 +17,9 @@ public class DoctorService {
 
     @Autowired
     private DoctorRepo doctorRepo;
+
+    @Autowired
+    private AppointmentFeignClient appointmentFeignClient;
 
     public List<DoctorDTO> getAllDoctors() {
         List<Doctor> doctorList = doctorRepo.findAll();
@@ -38,6 +42,22 @@ public class DoctorService {
         }
 
         return toDTO(doctor.get());
+    }
+
+    public String deleteById(String id) throws Exception {
+        Optional<Doctor> doctor = doctorRepo.findById(id);
+        if(doctor.isEmpty()) {
+            throw new ResourceNotFoundException("Doctor not found!");
+        }
+        try {
+            doctorRepo.deleteById(id);
+            appointmentFeignClient.deleteAllAppointmentsByDoctor(id);
+
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
+
+        return "Successfully Deleted";
     }
 
     public DoctorDTO toDTO(Doctor doctor) {

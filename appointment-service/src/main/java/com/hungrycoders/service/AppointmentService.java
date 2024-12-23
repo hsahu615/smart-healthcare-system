@@ -54,6 +54,26 @@ public class AppointmentService {
         return this.toDTO(appointmentRepository.save(this.toModel(appointmentDTO)));
     }
 
+    public String deleteAllAppointmentsByDoctor(String id) {
+        try {
+            appointmentRepository.deleteAllByDoctorId(id);
+            return "Successfully deleted all appointments";
+        } catch (Exception e) {
+            throw new ResourceNotFoundException(e.getMessage());
+        }
+
+    }
+
+    public String deleteById(String id) {
+        try {
+            appointmentRepository.deleteById(id);
+            return "Successfully deleted";
+        } catch (Exception e) {
+            throw new ResourceNotFoundException(e.getMessage());
+        }
+
+    }
+
     public AppointmentDTO toDTO(Appointment appointment) {
         AppointmentDTO appointmentDTO = new AppointmentDTO();
         appointmentDTO.setId(appointment.getId());

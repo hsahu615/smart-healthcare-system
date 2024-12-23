@@ -32,4 +32,9 @@ public class DoctorController {
     public ResponseEntity<DoctorDTO> save(@RequestBody  DoctorDTO doctorDTO) throws Exception {
         return new ResponseEntity<>(doctorService.addDoctor(doctorDTO), HttpStatus.OK);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteById(@PathVariable String id) throws Exception {
+        return new ResponseEntity<>(doctorService.deleteById(id), HttpStatus.OK);
+    }
 }

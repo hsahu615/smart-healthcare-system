@@ -3,6 +3,8 @@ package com.hungrycoders.controller;
 import com.hungrycoders.DTO.AppointmentDTO;
 import com.hungrycoders.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,5 +34,15 @@ public class AppointmentController {
         @PutMapping("/")
         public AppointmentDTO updateAppointment(@RequestBody AppointmentDTO appointmentDTO) {
             return appointmentService.updateAppointment(appointmentDTO);
+        }
+
+        @DeleteMapping("/all/{id}")
+        public ResponseEntity<?> deleteAllAppointmentsByDoctor(@PathVariable String id) {
+            return new ResponseEntity<>(appointmentService.deleteAllAppointmentsByDoctor(id), HttpStatus.OK);
+        }
+
+        @DeleteMapping("/{id}")
+        public ResponseEntity<?> deleteById(@PathVariable String id) {
+            return new ResponseEntity<>(appointmentService.deleteById(id), HttpStatus.OK);
         }
 }

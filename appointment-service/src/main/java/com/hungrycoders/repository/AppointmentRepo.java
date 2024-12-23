@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface AppointmentRepo extends MongoRepository<Appointment, String> {
     List<Appointment> findByDoctorId(String doctorId);
+    void deleteAllByDoctorId(String doctorId);
 }
