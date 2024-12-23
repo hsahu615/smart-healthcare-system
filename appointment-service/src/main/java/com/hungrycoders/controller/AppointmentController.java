@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin(originPatterns = "*")
 @RequestMapping("/appointment")
 public class AppointmentController {
         @Autowired
@@ -19,7 +20,17 @@ public class AppointmentController {
         }
 
         @GetMapping("{id}")
-        public List<AppointmentDTO> getAppointmentsByPatient(@PathVariable String id) {
-            return appointmentService.getById(id);
+        public List<AppointmentDTO> getAppointmentsByDoctor(@PathVariable String id) {
+            return appointmentService.getByDoctorId(id);
+        }
+
+        @GetMapping("/all")
+        public List<AppointmentDTO> getAllAppointments() {
+            return appointmentService.getAllAppointments();
+        }
+
+        @PutMapping("/")
+        public AppointmentDTO updateAppointment(@RequestBody AppointmentDTO appointmentDTO) {
+            return appointmentService.updateAppointment(appointmentDTO);
         }
 }

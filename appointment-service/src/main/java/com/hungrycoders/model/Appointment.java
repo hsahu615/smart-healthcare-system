@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class Appointment {
     @Id
     private String id;
+    private String patientName;
     private String doctorId;
     private LocalDateTime appointmentTime;
     private String status; // e.g., "Scheduled", "Completed", "Cancelled"
@@ -16,8 +17,9 @@ public class Appointment {
 
     }
 
-    public Appointment(String id, String doctorId, LocalDateTime appointmentTime, String status) {
+    public Appointment(String id, String patientName, String doctorId, LocalDateTime appointmentTime, String status) {
         this.id = id;
+        this.patientName = patientName;
         this.doctorId = doctorId;
         this.appointmentTime = appointmentTime;
         this.status = status;
@@ -30,7 +32,13 @@ public class Appointment {
     public void setId(String id) {
         this.id = id;
     }
+    public String getPatientName() {
+        return patientName;
+    }
 
+    public void setPatientName(String patientName) {
+        this.patientName = patientName;
+    }
     public String getDoctorId() {
         return doctorId;
     }

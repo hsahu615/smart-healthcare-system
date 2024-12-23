@@ -1,6 +1,6 @@
 package com.hungrycoders.config;
 
-import com.hungrycoders.api_gateway.filter.AuthenticationFilter;
+import com.hungrycoders.filter.AuthenticationFilter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;

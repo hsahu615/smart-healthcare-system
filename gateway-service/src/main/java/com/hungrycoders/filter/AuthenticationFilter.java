@@ -1,7 +1,7 @@
 package com.hungrycoders.filter;
 
-import com.hungrycoders.api_gateway.config.JwtUtil;
-import com.hungrycoders.api_gateway.config.RouterValidator;
+import com.hungrycoders.config.JwtUtil;
+import com.hungrycoders.config.RouterValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilter;

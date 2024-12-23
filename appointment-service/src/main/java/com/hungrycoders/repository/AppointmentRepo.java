@@ -7,5 +7,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface AppointmentRepo extends MongoRepository<Appointment, String> {
-    List<Appointment> findByDoctorIdAndAppointmentTimeBetween(String doctorId, LocalDateTime start, LocalDateTime end);
+    List<Appointment> findByDoctorId(String doctorId);
 }

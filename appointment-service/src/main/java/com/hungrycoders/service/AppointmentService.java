@@ -9,11 +9,11 @@ import com.hungrycoders.repository.AppointmentRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,15 +40,24 @@ public class AppointmentService {
         }
     }
 
-    public List<AppointmentDTO> getById(String id) {
-        return appointmentRepository.findAll().stream()
-                .filter(appointment -> appointment.getId().equals(id))
+    public List<AppointmentDTO> getByDoctorId(String doctorId) {
+        return appointmentRepository.findByDoctorId(doctorId).stream()
                 .map((this::toDTO)).collect(Collectors.toList());
+    }
+
+    public List<AppointmentDTO> getAllAppointments() {
+        return appointmentRepository.findAll().stream()
+                .map((this::toDTO)).collect(Collectors.toList());
+    }
+
+    public AppointmentDTO updateAppointment(AppointmentDTO appointmentDTO) {
+        return this.toDTO(appointmentRepository.save(this.toModel(appointmentDTO)));
     }
 
     public AppointmentDTO toDTO(Appointment appointment) {
         AppointmentDTO appointmentDTO = new AppointmentDTO();
         appointmentDTO.setId(appointment.getId());
+        appointmentDTO.setPatientName(appointment.getPatientName());
         appointmentDTO.setAppointmentTime(appointment.getAppointmentTime());
         appointmentDTO.setDoctorId(appointment.getDoctorId());
         appointmentDTO.setStatus(appointment.getStatus());
@@ -58,6 +67,7 @@ public class AppointmentService {
     public Appointment toModel(AppointmentDTO appointmentDTO) {
         Appointment appointment = new Appointment();
         appointment.setId(appointmentDTO.getId());
+        appointment.setPatientName(appointmentDTO.getPatientName());
         appointment.setAppointmentTime(appointmentDTO.getAppointmentTime());
         appointment.setDoctorId(appointmentDTO.getDoctorId());
         appointment.setStatus(appointmentDTO.getStatus());
