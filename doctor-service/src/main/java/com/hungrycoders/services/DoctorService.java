@@ -2,6 +2,7 @@ package com.hungrycoders.services;
 
 import com.hungrycoders.exception.ResourceNotFoundException;
 import com.hungrycoders.model.Doctor;
+import com.hungrycoders.model.DoctorStatus;
 import com.hungrycoders.repository.DoctorRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ public class DoctorService {
         Doctor doctorEntity = new Doctor(generatedId,
                 doctor.getFirstName(), doctor.getLastName(),
                 doctor.getEmail(), doctor.getPhone(), doctor.getSpeciality(),
-                doctor.getYearsOfExperience(), doctor.getStatus());
+                doctor.getYearsOfExperience(), DoctorStatus.fromValue(doctor.getStatus()));
         logger.debug("Saved doctor with id: {}", generatedId);
         return doctorRepository.save(doctorEntity);
     }
@@ -66,13 +67,14 @@ public class DoctorService {
         Doctor doctorToUpdate = existingDoctor.get();
 
         // Update the fields of the existing doctor with the new values
+        doctorToUpdate.setId(uuid);
         doctorToUpdate.setFirstName(doctor.getFirstName());
         doctorToUpdate.setLastName(doctor.getLastName());
         doctorToUpdate.setEmail(doctor.getEmail());
         doctorToUpdate.setPhone(doctor.getPhone());
         doctorToUpdate.setSpeciality(doctor.getSpeciality());
         doctorToUpdate.setYearsOfExperience(doctor.getYearsOfExperience());
-        doctorToUpdate.setStatus(doctor.getStatus());
+        doctorToUpdate.setStatus(DoctorStatus.fromValue(doctor.getStatus()));
 
         // Log the update operation
         logger.debug("Updated doctor with id: {}", id);

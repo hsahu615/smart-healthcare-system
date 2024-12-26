@@ -19,7 +19,6 @@ import java.util.UUID;
 @Document(value = "doctor")
 public class Doctor {
 
-
     @Id
     private UUID id;
 
