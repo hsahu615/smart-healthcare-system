@@ -1,6 +1,6 @@
 package com.hungrycoders.config;
 
-import com.hungrycoders.api_gateway.filter.AuthenticationFilter;
+import com.hungrycoders.filter.AuthenticationFilter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -30,20 +30,36 @@ public class GatewayConfig {
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
                 // Route configuration for doctor-service
-                .route("doctor-service", r -> r.path("/doctor/**")
-                        .filters(f -> f.filter(filter)) // Attach custom filter
-                        .uri("lb://doctor-service")) // Load-balanced URI
+                .route("doctor-service", r -> r.path("/doctors")
+                        .filters(f -> f.filter(filter)
+                                .circuitBreaker(config -> config
+                                        .setName("doctorCircuitBreaker")
+                                        .setFallbackUri("forward:/fallback/doctor")))
+                        .uri("http://doctor-service:8080/doctors")) // Load-balanced URI
+
+                // Route configuration for patient-service
+                .route("patient-service", r -> r.path("/patients")
+                        .filters(f -> f.filter(filter)
+                                .circuitBreaker(config -> config
+                                        .setName("patientCircuitBreaker")
+                                        .setFallbackUri("forward:/fallback/patient")))
+                        .uri("http://doctor-service:8080/patients")) // Load-balanced URI
 
                 // Route configuration for appointment-service
-                .route("appointment-service", r -> r.path("/appointment/**")
-                        .filters(f -> f.filter(filter)) // Attach custom filter
-                        .uri("lb://appointment-service")) // Load-balanced URI
-
+                .route("appointment-service", r -> r.path("/appointment")
+                        .filters(f -> f.filter(filter)
+                                .circuitBreaker(config -> config
+                                        .setName("appointmentServiceCircuitBreaker")
+                                        .setFallbackUri("forward:/fallback/appointment")))
+                        .uri("http://appointment-service:8080/appointment"))
 
                 // Route configuration for auth-service
-                .route("auth-service", r -> r.path("/auth/**")
-                        .filters(f -> f.filter(filter)) // Attach custom filter
-                        .uri("lb://auth-service")) // Load-balanced URI
+                .route("auth-service", r -> r.path("/auth")
+                        .filters(f -> f.filter(filter)
+                                .circuitBreaker(config -> config
+                                        .setName("authServiceCircuitBreaker")
+                                        .setFallbackUri("forward:/fallback/auth")))
+                        .uri("http://appointment-service:8080/auth"))// Load-balanced URI
                 .build();
     }
 }
