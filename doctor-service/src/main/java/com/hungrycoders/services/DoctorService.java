@@ -1,70 +1,97 @@
 package com.hungrycoders.services;
 
-import com.hungrycoders.DTO.DoctorDTO;
 import com.hungrycoders.exception.ResourceNotFoundException;
 import com.hungrycoders.model.Doctor;
-import com.hungrycoders.repository.DoctorRepo;
+import com.hungrycoders.repository.DoctorRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Service
 public class DoctorService {
 
+    private static final Logger logger = LoggerFactory.getLogger(DoctorService.class);
+
     @Autowired
-    private DoctorRepo doctorRepo;
+    private DoctorRepository doctorRepository;
 
-    public List<DoctorDTO> getAllDoctors() {
-        List<Doctor> doctorList = doctorRepo.findAll();
-        return doctorList.stream().map(this::toDTO).collect(Collectors.toList());
+    public List<Doctor> getAllDoctors() {
+        List<Doctor> doctorList = doctorRepository.findAll();
+        logger.debug("Number of doctors fetched: {}", doctorList.size());
+        return new ArrayList<>(doctorList);
     }
 
-    public DoctorDTO addDoctor(DoctorDTO doctor) throws Exception {
-        Optional<Doctor> optionalDoctor = doctorRepo.findByEmail(doctor.getEmail());
+    public Doctor addDoctor(com.hungrycoders.payload.request.Doctor doctor) throws Exception {
+        Optional<Doctor> optionalDoctor = doctorRepository.findByEmail(doctor.getEmail());
         if(optionalDoctor.isPresent()) {
-            throw new Exception("Doctor already exists.");
+            logger.error("Failed to add doctor: A doctor with email {} already exists", doctor.getEmail());
+            throw new Exception("A doctor with this email already exists");
         }
-        Doctor savedDoctor = doctorRepo.save(this.toModel(doctor));
-        return this.toDTO(savedDoctor);
+        UUID generatedId = UUID.randomUUID();
+        Doctor doctorEntity = new Doctor(generatedId,
+                doctor.getFirstName(), doctor.getLastName(),
+                doctor.getEmail(), doctor.getPhone(), doctor.getSpeciality(),
+                doctor.getYearsOfExperience(), doctor.getStatus());
+        logger.debug("Saved doctor with id: {}", generatedId);
+        return doctorRepository.save(doctorEntity);
     }
 
-    public DoctorDTO getDoctorById(String id) throws ResourceNotFoundException {
-        Optional<Doctor> doctor = doctorRepo.findById(id);
+    public Doctor getDoctorById(String id) throws ResourceNotFoundException {
+        Optional<Doctor> doctor = doctorRepository.findById(UUID.fromString(id));
         if(doctor.isEmpty()) {
-            throw new ResourceNotFoundException("Doctor not found!");
+            logger.error("Doctor not found with id: {}", id);
+            throw new ResourceNotFoundException("doctor not found");
+        }
+        logger.info("Doctor fetched successfully with id: {}", id);
+        return doctor.get();
+    }
+
+    public Doctor updateDoctorById(String id, com.hungrycoders.payload.request.Doctor doctor) throws ResourceNotFoundException {
+        UUID uuid = UUID.fromString(id); // Convert String to UUID
+
+        // Check if the doctor exists
+        Optional<Doctor> existingDoctor = doctorRepository.findById(uuid);
+        if (existingDoctor.isEmpty()) {
+            logger.error("Failed to update doctor: Doctor not found with id: {}", id);
+            throw new ResourceNotFoundException("Doctor not found with id: " + id);
         }
 
-        return toDTO(doctor.get());
+        // Get the existing doctor entity
+        Doctor doctorToUpdate = existingDoctor.get();
+
+        // Update the fields of the existing doctor with the new values
+        doctorToUpdate.setFirstName(doctor.getFirstName());
+        doctorToUpdate.setLastName(doctor.getLastName());
+        doctorToUpdate.setEmail(doctor.getEmail());
+        doctorToUpdate.setPhone(doctor.getPhone());
+        doctorToUpdate.setSpeciality(doctor.getSpeciality());
+        doctorToUpdate.setYearsOfExperience(doctor.getYearsOfExperience());
+        doctorToUpdate.setStatus(doctor.getStatus());
+
+        // Log the update operation
+        logger.debug("Updated doctor with id: {}", id);
+
+        // Save the updated doctor entity back to the repository
+        return doctorRepository.save(doctorToUpdate);
     }
 
-    public DoctorDTO toDTO(Doctor doctor) {
-        return new DoctorDTO(
-                doctor.getId(),
-                doctor.getFirstName(),
-                doctor.getLastName(),
-                doctor.getEmail(),
-                doctor.getPhone(),
-                doctor.getSpecialty(),
-                doctor.getYearsOfExperience(),
-                doctor.getIsAvailable()
-        );
+
+    public void deleteDoctorById(String id) throws ResourceNotFoundException {
+        UUID uuid = UUID.fromString(id); // Convert String to UUID
+        if (!doctorRepository.existsById(uuid)) {
+            logger.error("Failed to delete doctor: Doctor not found with id: {}", id);
+            throw new ResourceNotFoundException("doctor not found with id: " + id);
+        }
+        doctorRepository.deleteById(uuid); // Delete the doctor by UUID
+        logger.info("Doctor deleted successfully with id: {}", id);
     }
 
-    public Doctor toModel(DoctorDTO doctorDTO) {
-        return new Doctor(
-                doctorDTO.getId(),
-                doctorDTO.getFirstName(),
-                doctorDTO.getLastName(),
-                doctorDTO.getEmail(),
-                doctorDTO.getPhone(),
-                doctorDTO.getSpecialty(),
-                doctorDTO.getYearsOfExperience(),
-                doctorDTO.getIsAvailable()
-        );
-    }
 }
 
 

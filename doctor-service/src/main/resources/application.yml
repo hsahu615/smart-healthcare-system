@@ -14,4 +14,4 @@ logging:
                 servlet: DEBUG
 
 server:
-    port: ${DOCTOR_SERVICE_PORT}
+    port: ${DOCTOR_SERVICE_PORT:8081}
