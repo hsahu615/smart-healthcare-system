@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration // Marks this class as a configuration class for Spring
- // Generates a constructor for final fields (AuthenticationFilter)
 public class GatewayConfig {
 
     // Injects the custom authentication filter for validating requests
@@ -17,7 +16,6 @@ public class GatewayConfig {
     public GatewayConfig(AuthenticationFilter filter) {
         this.filter = filter;
     }
-
 
     /**
      * Configures routes for the API Gateway.
@@ -30,36 +28,37 @@ public class GatewayConfig {
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
                 // Route configuration for doctor-service
-                .route("doctor-service", r -> r.path("/doctors")
+                .route("doctor-service", r -> r.path("/doctors/**")
                         .filters(f -> f.filter(filter)
                                 .circuitBreaker(config -> config
                                         .setName("doctorCircuitBreaker")
                                         .setFallbackUri("forward:/fallback/doctor")))
-                        .uri("http://doctor-service:8080/doctors")) // Load-balanced URI
+                        .uri("http://doctor-service:8080")) // Correct URI for doctor-service
 
                 // Route configuration for patient-service
-                .route("patient-service", r -> r.path("/patients")
+                .route("patient-service", r -> r.path("/patients/**")
                         .filters(f -> f.filter(filter)
                                 .circuitBreaker(config -> config
                                         .setName("patientCircuitBreaker")
                                         .setFallbackUri("forward:/fallback/patient")))
-                        .uri("http://doctor-service:8080/patients")) // Load-balanced URI
+                        .uri("http://patient-service:8080")) // Correct URI for patient-service
 
                 // Route configuration for appointment-service
-                .route("appointment-service", r -> r.path("/appointment")
+                .route("appointment-service", r -> r.path("/appointments/**")
                         .filters(f -> f.filter(filter)
                                 .circuitBreaker(config -> config
                                         .setName("appointmentServiceCircuitBreaker")
                                         .setFallbackUri("forward:/fallback/appointment")))
-                        .uri("http://appointment-service:8080/appointment"))
+                        .uri("http://appointment-service:8080")) // Correct URI for appointment-service
 
                 // Route configuration for auth-service
-                .route("auth-service", r -> r.path("/auth")
+                .route("auth-service", r -> r.path("/auth/**")
                         .filters(f -> f.filter(filter)
                                 .circuitBreaker(config -> config
                                         .setName("authServiceCircuitBreaker")
                                         .setFallbackUri("forward:/fallback/auth")))
-                        .uri("http://appointment-service:8080/auth"))// Load-balanced URI
+                        .uri("http://auth-service:8080")) // Correct URI for auth-service
+
                 .build();
     }
 }
