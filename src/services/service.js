@@ -18,6 +18,11 @@ export const getAllDoctors = async () => {
   return jsonData;
 };
 
+export const getAllPatients = async () => {
+  const jsonData = await axios.get("http://localhost:8081/patient/all");
+  return jsonData;
+};
+
 export const deleteDoctorById = async (doctorId) => {
   try {
     const dltrequest = await axios.delete(
@@ -42,6 +47,17 @@ export async function deleteAppointmentById(appointmentId) {
   }
 }
 
+export async function deletePatientById(patientId) {
+  try {
+    const dltrequest = await axios.delete(
+      `http://localhost:8081/patient/${patientId}`
+    );
+    return dltrequest;
+  } catch (e) {
+    console.log("error");
+  }
+}
+
 export async function getDoctorById(doctorId) {
   try {
     const doctor = await axios.get(`http://localhost:8081/doctor/${doctorId}`);
@@ -55,3 +71,25 @@ export const getAllAppointments = async () => {
   const jsonData = await axios.get("http://localhost:8080/appointment/all");
   return jsonData;
 };
+
+export async function getAllAppointmentsByDoctor(doctorId) {
+  try {
+    const doctors = await axios.get(
+      `http://localhost:8080/appointment/doctor/${doctorId}`
+    );
+    return doctors;
+  } catch (e) {
+    console.log("error");
+  }
+}
+
+export async function getAllAppointmentsByPatient(patientId) {
+  try {
+    const patients = await axios.get(
+      `http://localhost:8080/appointment/patient/${patientId}`
+    );
+    return patients;
+  } catch (e) {
+    console.log("error");
+  }
+}

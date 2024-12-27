@@ -1,10 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Home.css";
 import Appointments from "../../components/Appointments/Appointments";
 import Doctors from "../../components/Doctors/Doctors";
+import Patients from "../../components/Patients/Patients";
 
 const Home = () => {
-  const [currentSection, setCurrentSection] = useState("Doctors");
+  const [currentSection, setCurrentSection] = useState("Appointments");
+  const [currentRole, setCurrentRole] = useState<any>("");
+
+  useEffect(() => {
+    const role = localStorage.getItem("userRole");
+    setCurrentRole(role);
+  }, []);
 
   const handleSectionChange = (e) => {
     setCurrentSection(e.target.value);
@@ -19,10 +26,19 @@ const Home = () => {
           defaultValue={currentSection}
           onChange={handleSectionChange}
         >
-          <option value="Doctors">Doctors</option>
+          {currentRole === "admin" && <option value="Doctors">Doctors</option>}
           <option value="Appointments">Appointments</option>
+          {currentRole === "admin" && (
+            <option value="Patients">Patients</option>
+          )}
         </select>
-        {currentSection === "Doctors" ? <Doctors /> : <Appointments />}
+        {currentSection === "Doctors" ? (
+          <Doctors />
+        ) : currentSection === "Patients" ? (
+          <Patients />
+        ) : (
+          <Appointments />
+        )}
       </div>
     </div>
   );

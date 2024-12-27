@@ -5,10 +5,11 @@ import { addAppointment, getAllDoctors } from "../../services/service";
 
 const AddAppointment = () => {
   const initialAppointment = {
-    patientName: "",
     doctorId: "",
     appointmentTime: "",
-    status: "Scheduled",
+    status: "pending",
+    patientComments: "",
+    doctorComments: "",
   };
   const [appointment, setAppointment] = useState(initialAppointment);
   const [doctors, setDoctors] = useState([]);
@@ -23,7 +24,7 @@ const AddAppointment = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
+    appointment.patientId = "676d844f8702bb41e78e96dc";
     addAppointment(appointment)
       .then((res) => {
         if (res.status === 200) {
@@ -61,34 +62,27 @@ const AddAppointment = () => {
         <h2>Add appointment</h2>
         <form onSubmit={handleSubmit} onReset={handleReset}>
           <div className="my-4">
-            <label htmlFor="patientName" className="form-label">
-              Patient Name
+            <label htmlFor="doctorId" className="form-label">
+              Doctor
             </label>
-            <input
-              required
-              value={appointment.patientName}
-              onChange={handleChange}
-              type="text"
-              className="form-control"
-              id="patientName"
-            />
-          </div>
-          <div className="my-4">
             <select
               required
               className="form-select"
               onChange={handleChange}
               id="doctorId"
             >
-              {doctors.map((doctor) => (
-                <option value={doctor.id}>
-                  {doctor.firstName.trim() + " " + doctor.lastName.trim()}
-                </option>
-              ))}
+              {doctors.map(
+                (doctor) =>
+                  doctor.status.toLowerCase() === "available" && (
+                    <option value={doctor.id}>
+                      {doctor.firstName.trim() + " " + doctor.lastName.trim()}
+                    </option>
+                  )
+              )}
             </select>
           </div>
           <div className="my-4">
-            <label htmlFor="lastName" className="form-label">
+            <label htmlFor="appointmentTime" className="form-label">
               Appointment Time
             </label>
             <input

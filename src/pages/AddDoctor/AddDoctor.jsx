@@ -12,7 +12,6 @@ const AddDoctor = () => {
     phone: "",
     specialty: "",
     yearsOfExperience: 0,
-    isAvailable: true,
   };
   const [doctor, setDoctor] = useState(initialDoctor);
 
@@ -133,20 +132,6 @@ const AddDoctor = () => {
               min={0}
               id="yearsOfExperience"
             />
-          </div>
-          <div className="my-4">
-            <div class="form-check">
-              <input
-                type="checkbox"
-                className="form-check-input"
-                id="isAvailable"
-                checked={doctor.isAvailable}
-                onChange={handleChange}
-              />
-              <label class="form-check-label" htmlFor="isAvailable">
-                Available
-              </label>
-            </div>
           </div>
           <div className="my-4 d-flex">
             <button className="btn btn-primary" type="submit">
