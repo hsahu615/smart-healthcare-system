@@ -4,7 +4,7 @@ public class DoctorDTO {
     public DoctorDTO() {
     }
 
-    public DoctorDTO(String id, String firstName, String lastName, String email, String phone, String specialty, Integer yearsOfExperience, boolean isAvailable) {
+    public DoctorDTO(String id, String firstName, String lastName, String email, String phone, String specialty, Integer yearsOfExperience, String status) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -12,7 +12,7 @@ public class DoctorDTO {
         this.phone = phone;
         this.specialty = specialty;
         this.yearsOfExperience = yearsOfExperience;
-        this.isAvailable = isAvailable;
+        this.status = status;
     }
 
     private String id;
@@ -22,7 +22,7 @@ public class DoctorDTO {
     private String phone;
     private String specialty;
     private Integer yearsOfExperience;
-    private boolean isAvailable;
+    private String status;
 
     public String getId() {
         return id;
@@ -80,11 +80,11 @@ public class DoctorDTO {
         this.yearsOfExperience = yearsOfExperience;
     }
 
-    public boolean getIsAvailable() {
-        return this.isAvailable;
+    public String getStatus() {
+        return this.status;
     }
 
-    public void setIsAvailable(boolean available) {
-        this.isAvailable = available;
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

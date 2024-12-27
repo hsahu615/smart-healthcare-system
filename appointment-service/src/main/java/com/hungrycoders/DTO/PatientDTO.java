@@ -1,28 +1,24 @@
 package com.hungrycoders.DTO;
 
-public class DoctorDTO {
+public class PatientDTO {
+
     private String id;
     private String firstName;
     private String lastName;
     private String email;
     private String phone;
-    private String specialty;
-    private Integer yearsOfExperience;
-    private String status;
+    private Integer age;
 
-    public DoctorDTO()  {
-
+    public PatientDTO() {
     }
 
-    public DoctorDTO(String id, String firstName, String lastName, String email, String phone, String specialty, Integer yearsOfExperience, String status) {
+    public PatientDTO(String id, String firstName, String lastName, String email, String phone, Integer age) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phone = phone;
-        this.specialty = specialty;
-        this.yearsOfExperience = yearsOfExperience;
-        this.status = status;
+        this.age = age;
     }
 
     public String getId() {
@@ -65,27 +61,11 @@ public class DoctorDTO {
         this.phone = phone;
     }
 
-    public String getSpecialty() {
-        return specialty;
+    public Integer getAge() {
+        return age;
     }
 
-    public void setSpecialty(String specialty) {
-        this.specialty = specialty;
-    }
-
-    public Integer getYearsOfExperience() {
-        return yearsOfExperience;
-    }
-
-    public void setYearsOfExperience(Integer yearsOfExperience) {
-        this.yearsOfExperience = yearsOfExperience;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public void setAge(Integer age) {
+        this.age = age;
     }
 }

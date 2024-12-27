@@ -20,7 +20,8 @@ public class DoctorController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DoctorDTO> getDoctorById(@PathVariable String id) throws ResourceNotFoundException {
-        return new ResponseEntity<>(doctorService.getDoctorById(id), HttpStatus.OK);
+        DoctorDTO doctorDTO = doctorService.getDoctorById(id);
+        return new ResponseEntity<>(doctorDTO, HttpStatus.OK);
     }
 
     @GetMapping("/all")

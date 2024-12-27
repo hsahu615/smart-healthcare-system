@@ -31,6 +31,7 @@ public class DoctorService {
         if(optionalDoctor.isPresent()) {
             throw new Exception("Doctor already exists.");
         }
+        doctor.setStatus("available");
         Doctor savedDoctor = doctorRepo.save(this.toModel(doctor));
         return this.toDTO(savedDoctor);
     }
@@ -40,8 +41,8 @@ public class DoctorService {
         if(doctor.isEmpty()) {
             throw new ResourceNotFoundException("Doctor not found!");
         }
-
-        return toDTO(doctor.get());
+        DoctorDTO doctorDTO = toDTO(doctor.get());
+        return doctorDTO;
     }
 
     public String deleteById(String id) throws Exception {
@@ -50,8 +51,9 @@ public class DoctorService {
             throw new ResourceNotFoundException("Doctor not found!");
         }
         try {
-            doctorRepo.deleteById(id);
-            appointmentFeignClient.deleteAllAppointmentsByDoctor(id);
+            Doctor doctor1 = doctor.get();
+            doctor1.setStatus("disabled");
+            doctorRepo.save(doctor1);
 
         } catch (Exception e) {
             throw new Exception(e);
@@ -69,7 +71,7 @@ public class DoctorService {
                 doctor.getPhone(),
                 doctor.getSpecialty(),
                 doctor.getYearsOfExperience(),
-                doctor.getIsAvailable()
+                doctor.getStatus()
         );
     }
 
@@ -82,7 +84,7 @@ public class DoctorService {
                 doctorDTO.getPhone(),
                 doctorDTO.getSpecialty(),
                 doctorDTO.getYearsOfExperience(),
-                doctorDTO.getIsAvailable()
+                doctorDTO.getStatus()
         );
     }
 }

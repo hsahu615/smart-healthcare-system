@@ -8,7 +8,7 @@ public class Doctor {
     public Doctor() {
     }
 
-    public Doctor(String id, String firstName, String lastName, String email, String phone, String specialty, Integer yearsOfExperience, boolean isAvailable) {
+    public Doctor(String id, String firstName, String lastName, String email, String phone, String specialty, Integer yearsOfExperience, String status) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -16,7 +16,7 @@ public class Doctor {
         this.phone = phone;
         this.specialty = specialty;
         this.yearsOfExperience = yearsOfExperience;
-        this.isAvailable = isAvailable;
+        this.status = status;
     }
 
     @Id
@@ -27,7 +27,7 @@ public class Doctor {
     private String phone;
     private String specialty;
     private Integer yearsOfExperience;
-    private boolean isAvailable;
+    private String status;
 
     public String getId() {
         return id;
@@ -85,11 +85,11 @@ public class Doctor {
         this.yearsOfExperience = yearsOfExperience;
     }
 
-    public boolean getIsAvailable() {
-        return this.isAvailable;
+    public String getStatus() {
+        return this.status;
     }
 
-    public void setIsAvailable(boolean available) {
-        this.isAvailable = available;
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
