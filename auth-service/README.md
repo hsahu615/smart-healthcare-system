@@ -61,12 +61,12 @@ docker run -d \
   ```
 
 ### Check MongoDB collections
-docker exec -it mongodb mongosh
-use admin
-db.auth("root", "rootpassword")
-use healthcare
-show collections
-db.roles.find()
+- docker exec -it mongodb mongosh
+- use admin
+- db.auth("root", "rootpassword")
+- use healthcare
+- show collections
+- db.roles.find()
 
 ## Running the Project
 
