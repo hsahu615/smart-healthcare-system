@@ -1,7 +1,7 @@
 package com.hungrycoders.models;
 
 public enum ERole {
-    ROLE_USER,
-    ROLE_MODERATOR,
+    ROLE_PATIENT,
+    ROLE_DOCTOR,
     ROLE_ADMIN
 }
