@@ -34,11 +34,11 @@ RUN mkdir /app && \
 USER 1000
 
 # Copy the Spring Boot JAR into the image
-COPY --chown=1000:1000 target/gateway-service-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --chown=1000:1000 target/auth-service-0.0.1-SNAPSHOT.jar /app/app.jar
 WORKDIR /app
 
 # Expose the application port
-EXPOSE 8080
+EXPOSE 8081
 
 # Define the entry point
 ENTRYPOINT [ "/jre/bin/java", "-Dspring.profiles.active=prod", "-jar", "/app/app.jar" ]

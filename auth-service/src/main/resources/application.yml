@@ -1,17 +1,21 @@
-
 spring:
   application:
-    name: api-gateway
+    name: auth-service
 
   data:
     mongodb:
-      uri: mongodb+srv://tempuser:tempuser@cluster0.yuuhwqt.mongodb.net/healthcare
+      uri: mongodb://root:rootpassword@localhost:27017/healthcare?authSource=admin
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+        servlet: DEBUG
 
 server:
-  port: 8080
+  port: ${AUTH_SERVICE_PORT:8081}
 
 
-hungrycoder:
-  app:
-    jwtSecret: "======================BezKoder=Spring==========================="
-    jwtExpirationMs: 86400000
+jwtSecret: aHR0cHM6Ly93d3cueW91YmlsdW1hbWVyaWNhLmNvbS9sb2dpbi8=
+jwtExpirationMs: 86400000
