@@ -1,0 +1,32 @@
+package com.hungrycoders.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.UUID;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+@Document(value = "patient")
+public class Patient {
+
+    @Id
+    private UUID id;
+
+    private String firstName;
+
+    private String lastName;
+
+    private String email;
+
+    private String phone;
+
+    private Integer age;
+
+}
