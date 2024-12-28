@@ -6,26 +6,29 @@ import { addAppointment, getAllDoctors } from "../../services/service";
 const AddAppointment = () => {
   const initialAppointment = {
     doctorId: "",
+    patientId: "f11649ab-fa80-4318-9fcd-db98cd99cf97",
     appointmentTime: "",
-    status: "pending",
-    patientComments: "",
+    status: "PENDING",
+    notes: "",
     doctorComments: "",
   };
   const [appointment, setAppointment] = useState(initialAppointment);
   const [doctors, setDoctors] = useState([]);
 
   useEffect(() => {
-    getAllDoctors().then((data) => {
-      setDoctors(data.data);
-      initialAppointment.doctorId = data.data[0].id;
+    getAllDoctors().then((res) => {
+      const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+      setDoctors(aps);
+      if (aps?.length > 0) initialAppointment.doctorId = aps[0].id;
       setAppointment(initialAppointment);
     });
   }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    appointment.patientId = "676d844f8702bb41e78e96dc";
-    addAppointment(appointment)
+    const appointmentTemp = appointment;
+    appointmentTemp.patientId = "f11649ab-fa80-4318-9fcd-db98cd99cf97";
+    addAppointment(appointmentTemp)
       .then((res) => {
         if (res.status === 200) {
           Swal.fire({
@@ -92,6 +95,19 @@ const AddAppointment = () => {
               type="datetime-local"
               className="form-control"
               id="appointmentTime"
+            />
+          </div>
+          <div className="my-4">
+            <label htmlFor="notes" className="form-label">
+              Notes
+            </label>
+            <input
+              required
+              value={appointment.notes}
+              onChange={handleChange}
+              type="text"
+              className="form-control"
+              id="notes"
             />
           </div>
           <div className="my-4 d-flex">

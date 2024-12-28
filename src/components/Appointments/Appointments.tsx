@@ -3,8 +3,12 @@ import "./Appointments.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendar,
+  faCancel,
+  faCheck,
   faClock,
+  faCross,
   faPencil,
+  faStickyNote,
   faUser,
   faUserDoctor,
 } from "@fortawesome/free-solid-svg-icons";
@@ -12,10 +16,12 @@ import {
   getAllAppointments,
   getAllAppointmentsByDoctor,
   getAllAppointmentsByPatient,
+  updateAppointment,
 } from "../../services/service";
+import Swal from "sweetalert2";
 
 const Appointments = () => {
-  const [appointments, setAppointments] = useState([]);
+  const [appointments, setAppointments] = useState<any>([]);
   const [doctor, setDoctor] = useState<any>({});
   const [updatedAppointment, setUpdatedAppointment] = useState<any>({
     appointmentTime: "",
@@ -33,25 +39,32 @@ const Appointments = () => {
   const [currentRole, setCurrentRole] = useState<any>("");
 
   useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = () => {
     const role = localStorage.getItem("userRole");
     setCurrentRole(role);
     if (role === "patient")
-      getAllAppointmentsByPatient("676b0ab13d57d7157b1d33fc").then(
-        (data: any) => {
-          setAppointments(data.data);
+      getAllAppointmentsByPatient("f11649ab-fa80-4318-9fcd-db98cd99cf97").then(
+        (res: any) => {
+          const aps = res?.data === undefined ? [] : res?.data;
+          setAppointments(aps);
         }
       );
     else if (role === "doctor")
-      getAllAppointmentsByDoctor("676b0bcb0d0755655988cb42").then(
-        (data: any) => {
-          setAppointments(data.data);
+      getAllAppointmentsByDoctor("cec1719f-e074-42e2-9dc2-fc9fd709347e").then(
+        (res: any) => {
+          const aps = res?.data === undefined ? [] : res?.data;
+          setAppointments(aps);
         }
       );
     else
-      getAllAppointments().then((data: any) => {
-        setAppointments(data.data);
+      getAllAppointments().then((res: any) => {
+        const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+        setAppointments(aps);
       });
-  }, []);
+  };
 
   const handleShow = (doctor: any) => {
     setDoctor(doctor);
@@ -74,6 +87,33 @@ const Appointments = () => {
     }).format(dat);
   };
 
+  const updateAppointmentStatus = (appointment, status) => {
+    appointment.status = status;
+    updateAppointment(appointment).then((res: any) => {
+      if (res.status === 200) fetchData();
+      else
+        Swal.fire({
+          title: "Error",
+          text: "Failed to update",
+          icon: "error",
+        });
+    });
+  };
+
+  const updateAfterCheckup = (appointment, e) => {
+    e.preventDefault();
+    appointment.doctorComments = e.target[3].value;
+    updateAppointment(appointment).then((res: any) => {
+      if (res.status === 200) fetchData();
+      else
+        Swal.fire({
+          title: "Error",
+          text: "Failed to update",
+          icon: "error",
+        });
+    });
+  };
+
   return (
     <div>
       {appointments.map((appointment: any) => (
@@ -81,9 +121,9 @@ const Appointments = () => {
           className="card my-2 w-100"
           style={{
             border:
-              appointment.status === "pending"
+              appointment.status.toLowerCase() === "pending"
                 ? "2px solid yellow"
-                : appointment.status === "confirmed"
+                : appointment.status.toLowerCase() === "confirmed"
                 ? "2px solid green"
                 : "2px solid red",
           }}
@@ -110,6 +150,12 @@ const Appointments = () => {
                       .join(":")}
                   </p>
                 </div>
+                <p className="card-text m-0">
+                  <span>
+                    <FontAwesomeIcon icon={faStickyNote} className="mx-1" />
+                  </span>
+                  {appointment.notes.slice(0, 40)}
+                </p>
               </div>
               <div className="d-flex flex-column justify-content-between align-items-center">
                 {showModal && (
@@ -165,10 +211,12 @@ const Appointments = () => {
                           ></button>
                         </div>
                         <div className="modal-body">
-                          <form>
+                          <form
+                            onSubmit={(e) => updateAfterCheckup(appointment, e)}
+                          >
                             <div className="my-4">
                               <label
-                                htmlFor="appointmentTime"
+                                htmlFor="patientName"
                                 className="form-label"
                               >
                                 Patient Name:
@@ -182,7 +230,7 @@ const Appointments = () => {
                                 }
                                 type="text"
                                 className="form-control"
-                                id="appointmentTime"
+                                id="patientName"
                                 disabled
                               />
                             </div>
@@ -203,33 +251,31 @@ const Appointments = () => {
                               />
                             </div>
                             <div className="my-4">
+                              <label htmlFor="notes" className="form-label">
+                                Patient Comments:
+                              </label>
+                              <textarea
+                                required
+                                value={appointment.notes}
+                                rows={3}
+                                className="form-control"
+                                id="notes"
+                                disabled
+                              />
+                            </div>
+                            <div className="my-4">
                               <label
-                                htmlFor="appointmentTime"
+                                htmlFor="doctorComments"
                                 className="form-label"
                               >
                                 Doctor Comments:
                               </label>
                               <input
                                 required
-                                value={appointment.doctorComments}
+                                name="doctorComments"
                                 type="text"
                                 className="form-control"
-                                id="appointmentTime"
-                              />
-                            </div>
-                            <div className="my-4">
-                              <label
-                                htmlFor="appointmentTime"
-                                className="form-label"
-                              >
-                                Status:
-                              </label>
-                              <input
-                                required
-                                value={appointment.doctorComments}
-                                type="text"
-                                className="form-control"
-                                id="appointmentTime"
+                                id="doctorComments"
                               />
                             </div>
                             <div className="my-4 d-flex">
@@ -243,7 +289,7 @@ const Appointments = () => {
                     </div>
                   </div>
                 )}
-
+                {/* Show Doctor button for non doctor roles to view doctor details */}
                 {currentRole !== "doctor" && (
                   <button className="bg-transparent border-0 p-1">
                     <FontAwesomeIcon
@@ -253,8 +299,10 @@ const Appointments = () => {
                     />
                   </button>
                 )}
+                {/* At the time of patient screening doctor leaves comments */}
                 {currentRole === "doctor" &&
-                  appointment.status !== "pending" && (
+                  appointment.status === "CONFIRMED" &&
+                  appointment?.doctor?.doctorComments?.length > 0 && (
                     <button className="bg-transparent border-0 p-1">
                       <FontAwesomeIcon
                         icon={faPencil}
@@ -262,6 +310,30 @@ const Appointments = () => {
                         onClick={() => updateModalShow(appointment)}
                       />
                     </button>
+                  )}
+                {/* Receiving new appointment (Confirm or reject) */}
+                {currentRole === "doctor" &&
+                  appointment.status === "PENDING" && (
+                    <div>
+                      <button className="bg-transparent border-0 p-1">
+                        <FontAwesomeIcon
+                          icon={faCancel}
+                          className="mx-1"
+                          onClick={() =>
+                            updateAppointmentStatus(appointment, "REJECTED")
+                          }
+                        />
+                      </button>
+                      <button className="bg-transparent border-0 p-1">
+                        <FontAwesomeIcon
+                          icon={faCheck}
+                          className="mx-1"
+                          onClick={() =>
+                            updateAppointmentStatus(appointment, "CONFIRMED")
+                          }
+                        />
+                      </button>
+                    </div>
                   )}
               </div>
             </div>

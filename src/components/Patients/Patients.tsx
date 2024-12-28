@@ -9,8 +9,9 @@ const Patients = () => {
   const [patients, setPatients] = useState([]);
 
   useEffect(() => {
-    getAllPatients().then((data: any) => {
-      setPatients(data.data);
+    getAllPatients().then((res: any) => {
+      const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+      setPatients(aps);
     });
   }, []);
 

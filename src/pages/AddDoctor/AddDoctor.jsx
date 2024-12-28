@@ -10,8 +10,9 @@ const AddDoctor = () => {
     lastName: "",
     email: "",
     phone: "",
-    specialty: "",
+    speciality: "",
     yearsOfExperience: 0,
+    status: "AVAILABLE",
   };
   const [doctor, setDoctor] = useState(initialDoctor);
 
@@ -116,7 +117,7 @@ const AddDoctor = () => {
               onChange={handleChange}
               type="text"
               className="form-control"
-              id="specialty"
+              id="speciality"
             />
           </div>
           <div className="my-4">

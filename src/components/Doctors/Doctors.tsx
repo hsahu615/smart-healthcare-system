@@ -22,15 +22,17 @@ const Doctors = () => {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    getAllDoctors().then((data: any) => {
-      setDoctors(data.data);
+    getAllDoctors().then((res: any) => {
+      const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+      setDoctors(aps);
     });
   }, []);
 
   const handleShow = (doctorId) => {
-    getAllAppointmentsByDoctor(doctorId).then((res: any) =>
-      setAppointments(res.data)
-    );
+    getAllAppointmentsByDoctor(doctorId).then((res: any) => {
+      const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+      setAppointments(aps);
+    });
     setShowModal(true);
   };
   const handleClose = () => setShowModal(false);
@@ -54,8 +56,9 @@ const Doctors = () => {
     }).then((value) => {
       if (value.isConfirmed) {
         deleteDoctorById(id).then(() => {
-          getAllDoctors().then((data: any) => {
-            setDoctors(data.data);
+          getAllDoctors().then((res: any) => {
+            const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+            setDoctors(aps);
           });
         });
       }
