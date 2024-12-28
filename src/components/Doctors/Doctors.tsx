@@ -74,7 +74,7 @@ const Doctors = () => {
             border:
               doctor.status.toLowerCase() == "available"
                 ? "2px solid green"
-                : doctor.status.toLowerCase() == "unavailable"
+                : doctor.status.toLowerCase() == "not_unavailable"
                 ? "2px solid yellow"
                 : "2px solid red",
           }}

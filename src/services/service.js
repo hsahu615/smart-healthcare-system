@@ -98,10 +98,23 @@ export async function getAllAppointmentsByPatient(patientId) {
   }
 }
 
-export async function updateAppointment(doctor) {
+export async function updateAppointment(appointment) {
   try {
     const res = await axios.put(
       `http://localhost:8080/api/v1/appointment/`,
+      appointment,
+      { method: "PUT" }
+    );
+    return res;
+  } catch (e) {
+    console.log("error");
+  }
+}
+
+export async function updateDoctor(doctor, id) {
+  try {
+    const res = await axios.patch(
+      `http://localhost:8081/api/v1/doctor/${id}`,
       doctor,
       { method: "PUT" }
     );

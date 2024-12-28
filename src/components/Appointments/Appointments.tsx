@@ -9,6 +9,7 @@ import {
   faCross,
   faPencil,
   faStickyNote,
+  faTrash,
   faUser,
   faUserDoctor,
 } from "@fortawesome/free-solid-svg-icons";
@@ -61,7 +62,7 @@ const Appointments = () => {
       );
     else
       getAllAppointments().then((res: any) => {
-        const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+        const aps = res?.data === undefined ? [] : res?.data;
         setAppointments(aps);
       });
   };
@@ -87,6 +88,12 @@ const Appointments = () => {
     }).format(dat);
   };
 
+  const isPast = (time) => {
+    const appointmentTime = new Date(time);
+    const currentTime = new Date();
+    return currentTime > appointmentTime;
+  };
+
   const updateAppointmentStatus = (appointment, status) => {
     appointment.status = status;
     updateAppointment(appointment).then((res: any) => {
@@ -104,8 +111,24 @@ const Appointments = () => {
     e.preventDefault();
     appointment.doctorComments = e.target[3].value;
     updateAppointment(appointment).then((res: any) => {
-      if (res.status === 200) fetchData();
-      else
+      if (res.status === 200) {
+        fetchData();
+        updateClose();
+      } else
+        Swal.fire({
+          title: "Error",
+          text: "Failed to update",
+          icon: "error",
+        });
+    });
+  };
+
+  const deleteAppointment = (appointment) => {
+    appointment.status = "REJECTED";
+    updateAppointment(appointment).then((res: any) => {
+      if (res.status === 200) {
+        fetchData();
+      } else
         Swal.fire({
           title: "Error",
           text: "Failed to update",
@@ -120,12 +143,13 @@ const Appointments = () => {
         <div
           className="card my-2 w-100"
           style={{
-            border:
-              appointment.status.toLowerCase() === "pending"
-                ? "2px solid yellow"
-                : appointment.status.toLowerCase() === "confirmed"
-                ? "2px solid green"
-                : "2px solid red",
+            border: isPast(appointment.appointmentTime)
+              ? "2px solid blue"
+              : appointment.status.toLowerCase() === "pending"
+              ? "2px solid yellow"
+              : appointment.status.toLowerCase() === "confirmed"
+              ? "2px solid green"
+              : "2px solid red",
           }}
         >
           <div className="card-body">
@@ -299,10 +323,22 @@ const Appointments = () => {
                     />
                   </button>
                 )}
+                {currentRole === "patient" &&
+                  !isPast(appointment.appointmentTime) &&
+                  appointment.status !== "REJECTED" && (
+                    <button className="bg-transparent border-0 p-1">
+                      <FontAwesomeIcon
+                        icon={faTrash}
+                        className="mx-1"
+                        onClick={() => deleteAppointment(appointment)}
+                      />
+                    </button>
+                  )}
                 {/* At the time of patient screening doctor leaves comments */}
                 {currentRole === "doctor" &&
+                  !isPast(appointment.appointmentTime) &&
                   appointment.status === "CONFIRMED" &&
-                  appointment?.doctor?.doctorComments?.length > 0 && (
+                  appointment?.doctorComments?.length === 0 && (
                     <button className="bg-transparent border-0 p-1">
                       <FontAwesomeIcon
                         icon={faPencil}
