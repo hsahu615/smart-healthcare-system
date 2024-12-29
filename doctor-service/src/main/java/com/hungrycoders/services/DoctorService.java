@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +43,8 @@ public class DoctorService {
     }
 
     public Doctor getDoctorById(String id) throws ResourceNotFoundException {
-        Optional<Doctor> doctor = doctorRepository.findById(UUID.fromString(id));
+        UUID uuid = UUID.fromString(id);
+        Optional<Doctor> doctor = doctorRepository.findById(uuid);
         if(doctor.isEmpty()) {
             logger.error("Doctor not found with id: {}", id);
             throw new ResourceNotFoundException("doctor not found");
@@ -86,11 +86,14 @@ public class DoctorService {
 
     public void deleteDoctorById(String id) throws ResourceNotFoundException {
         UUID uuid = UUID.fromString(id); // Convert String to UUID
-        if (!doctorRepository.existsById(uuid)) {
+        Optional<Doctor> optionalDoctor = doctorRepository.findById(uuid);
+        if (optionalDoctor.isEmpty()) {
             logger.error("Failed to delete doctor: Doctor not found with id: {}", id);
             throw new ResourceNotFoundException("doctor not found with id: " + id);
         }
-        doctorRepository.deleteById(uuid); // Delete the doctor by UUID
+        Doctor doctor = optionalDoctor.get();
+        doctor.setStatus(DoctorStatus.fromValue("DISABLED"));
+        doctorRepository.save(doctor); // Delete the doctor by UUID
         logger.info("Doctor deleted successfully with id: {}", id);
     }
 

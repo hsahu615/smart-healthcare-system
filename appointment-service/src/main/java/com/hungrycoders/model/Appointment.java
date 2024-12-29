@@ -1,7 +1,5 @@
 package com.hungrycoders.model;
 
-import com.hungrycoders.DTO.DoctorDTO;
-import com.hungrycoders.DTO.PatientDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,10 +16,10 @@ import java.time.LocalDateTime;
 public class Appointment {
     @Id
     private String id;
-    private PatientDTO patient;
-    private DoctorDTO doctor;
+    private Patient patient;
+    private Doctor doctor;
     private LocalDateTime appointmentTime;
-    private String status = "PENDING"; // e.g., "pending", "confirmed", "rejected"
+    private AppointmentStatus status; // e.g., "pending", "confirmed", "rejected"
     private String notes;
     private String doctorComments;
 }

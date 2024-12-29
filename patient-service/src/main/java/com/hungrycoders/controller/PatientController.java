@@ -24,13 +24,13 @@ public class PatientController {
     private PatientService patientService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getDoctorById(@PathVariable String id) throws ResourceNotFoundException {
+    public ResponseEntity<?> getPatientById(@PathVariable String id) throws ResourceNotFoundException {
         try {
             com.hungrycoders.model.Patient patient = patientService.getPatientById(id);
-            return ResponseEntity.status(200).body(new GenericResponse<>("Doctor fetched successfully", patientService.getPatientById(id)));
+            return ResponseEntity.status(200).body(new GenericResponse<>("Patient fetched successfully", patientService.getPatientById(id)));
         } catch (Exception e) {
-            logger.error("Error fetching doctor with id: {} {}", id, e.getMessage());
-            String errorMessage = "Error fetching doctor's details";
+            logger.error("Error fetching patient with id: {} {}", id, e.getMessage());
+            String errorMessage = "Error fetching patient's details";
             if (e.getMessage() != null && !e.getMessage().isBlank()) {
                 errorMessage += ": " + e.getMessage();
             }
@@ -40,13 +40,13 @@ public class PatientController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<?> getAllDoctors() throws Exception {
+    public ResponseEntity<?> getAllPatients() throws Exception {
         try {
-            List<com.hungrycoders.model.Patient> doctors = patientService.getAllPatients();
-            return ResponseEntity.status(200).body(new GenericResponse<>("Fetched doctors successfully", doctors));
+            List<com.hungrycoders.model.Patient> patients = patientService.getAllPatients();
+            return ResponseEntity.status(200).body(new GenericResponse<>("Fetched patients successfully", patients));
         } catch (Exception e) {
-            logger.error("Error fetching doctors: " + e.getMessage());
-            String errorMessage = "Error fetching doctors";
+            logger.error("Error fetching patients: " + e.getMessage());
+            String errorMessage = "Error fetching patients";
             if (e.getMessage() != null && !e.getMessage().isBlank()) {
                 errorMessage += ": " + e.getMessage();
             }
@@ -55,38 +55,27 @@ public class PatientController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> saveDoctor(@Valid @RequestBody com.hungrycoders.payload.request.Patient doctor) throws Exception {
+    public ResponseEntity<?> savePatient(@Valid @RequestBody com.hungrycoders.payload.request.Patient patient) throws Exception {
         try {
-            com.hungrycoders.model.Patient savedDoctor = patientService.addPatient(doctor);
-            return ResponseEntity.status(200).body(new GenericResponse<>("Doctor saved successfully", savedDoctor));
+            com.hungrycoders.model.Patient savedPatient = patientService.addPatient(patient);
+            return ResponseEntity.status(200).body(new GenericResponse<>("Patient saved successfully", savedPatient));
         } catch(Exception e) {
-            logger.error("Error saving doctor: " + e.getMessage());
-            return ResponseEntity.status(500).body(new GenericResponse<>("Error saving doctor"));
+            logger.error("Error saving patient: " + e.getMessage());
+            return ResponseEntity.status(500).body(new GenericResponse<>("Error saving patient"));
         }
 
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateDoctor(@Valid @RequestBody Patient doctor, @PathVariable String id) throws Exception {
+    public ResponseEntity<?> updatePatient(@Valid @RequestBody Patient patient, @PathVariable String id) throws Exception {
         try {
-            com.hungrycoders.model.Patient updatedDoctor = patientService.updatePatientById(id, doctor);
-            return ResponseEntity.status(200).body(new GenericResponse<>("Doctor updated successfully", updatedDoctor));
+            com.hungrycoders.model.Patient updatedPatient = patientService.updatePatientById(id, patient);
+            return ResponseEntity.status(200).body(new GenericResponse<>("Patient updated successfully", updatedPatient));
         } catch(Exception e) {
-            logger.error("Error updating doctor: " + e.getMessage());
-            return ResponseEntity.status(500).body(new GenericResponse<>("Error updating doctor"));
+            logger.error("Error updating patient: " + e.getMessage());
+            return ResponseEntity.status(500).body(new GenericResponse<>("Error updating patient"));
         }
 
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteDoctor(@PathVariable String id) throws Exception {
-        try {
-            patientService.deleteDoctorById(id);
-            return ResponseEntity.status(200).body(new GenericResponse<>("Doctor deleted successfully"));
-        } catch(Exception e) {
-            logger.error("Error deleting doctor: " + e.getMessage());
-            return ResponseEntity.status(500).body(new GenericResponse<>("Error deleting doctor"));
-        }
-
-    }
 }

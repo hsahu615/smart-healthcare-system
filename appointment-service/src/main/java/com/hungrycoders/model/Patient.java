@@ -1,4 +1,4 @@
-package com.hungrycoders.DTO;
+package com.hungrycoders.model;
 
 
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PatientDTO {
+public class Patient {
     private String id;
     private String firstName;
     private String lastName;

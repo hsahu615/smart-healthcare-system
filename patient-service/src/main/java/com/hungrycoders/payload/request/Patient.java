@@ -27,6 +27,8 @@ public class Patient implements Serializable {
     @NotBlank
     private String phone;
 
-    @NotBlank
+    @NotNull
+    @Min(value = 0, message = "age can't be below 0")
+    @Max(value = 100, message = "age can't be above 100")
     private Integer age;
 }
