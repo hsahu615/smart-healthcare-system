@@ -7,7 +7,8 @@ import jakarta.validation.ValidationException;
 
 public enum DoctorStatus {
     AVAILABLE,
-    NOT_AVAILABLE;
+    NOT_AVAILABLE,
+    DISABLED;
     @JsonCreator
     public static DoctorStatus fromValue(String value) {
         if(value == null || value.isBlank()) {

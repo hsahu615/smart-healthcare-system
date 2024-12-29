@@ -1,20 +1,22 @@
 package com.hungrycoders.service;
 
-import com.hungrycoders.DTO.AppointmentDTO;
-import com.hungrycoders.DTO.DoctorDTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hungrycoders.model.Doctor;
+import com.hungrycoders.model.Patient;
 import com.hungrycoders.FeignClient.DoctorFeignClient;
+import com.hungrycoders.FeignClient.PatientFeignClient;
 import com.hungrycoders.model.Appointment;
 import com.hungrycoders.exception.ResourceNotFoundException;
+import com.hungrycoders.model.AppointmentStatus;
+import com.hungrycoders.payload.request.AppointmentRequest;
+import com.hungrycoders.payload.request.DataRequest;
 import com.hungrycoders.repository.AppointmentRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Service
 public class AppointmentService {
@@ -24,53 +26,59 @@ public class AppointmentService {
     @Autowired
     private DoctorFeignClient doctorFeignClient;
 
-    public boolean isDoctorAvailable(String doctorId) {
-        ResponseEntity<DoctorDTO> doctorDTOResponseEntity = doctorFeignClient.getDoctorById(doctorId);
-        if(!doctorDTOResponseEntity.hasBody()) {
-            throw new ResourceNotFoundException("Doctor id is invalid!");
+    @Autowired
+    private PatientFeignClient patientFeignClient;
+
+
+    public String bookAppointment(AppointmentRequest appointment) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            DataRequest<Doctor> dataRequestDoctor = doctorFeignClient.getDoctorById(appointment.getDoctorId().toString()).getBody();
+            DataRequest<Patient> dataRequestPatient = patientFeignClient.getPatientById(appointment.getPatientId().toString()).getBody();
+            Appointment appointment1 = new Appointment();
+            appointment1.setDoctor(dataRequestDoctor.getData());
+            appointment1.setPatient(dataRequestPatient.getData());
+            appointment1.setAppointmentTime(appointment.getAppointmentTime());
+            appointment1.setDoctorComments(appointment.getDoctorComments());
+            appointment1.setNotes(appointment.getNotes());
+            appointment1.setStatus(AppointmentStatus.fromValue("PENDING"));
+            return appointmentRepository.save(appointment1).getId();
+        } catch (Exception e){
+            throw new ResourceNotFoundException("Error: " + e.getMessage());
         }
-        return Objects.requireNonNull(doctorDTOResponseEntity.getBody()).getIsAvailable();
     }
 
-    public AppointmentDTO bookAppointment(AppointmentDTO appointment) {
-        if (isDoctorAvailable(appointment.getDoctorId())) {
-            return this.toDTO(appointmentRepository.save(this.toModel(appointment)));
-        } else {
-            throw new ResourceNotFoundException("Doctor is not available at this time");
+    public List<Appointment> getByDoctorId(String doctorId) {
+        return appointmentRepository.findByDoctorId(doctorId, Sort.by(Sort.Direction.ASC, "appointmentTime"));
+    }
+
+    public List<Appointment> getByPatientId(String patientId) {
+        return appointmentRepository.findByPatientId(patientId, Sort.by(Sort.Direction.ASC, "appointmentTime"));
+    }
+
+    public List<Appointment> getAllAppointments() {
+        return appointmentRepository.findAllByOrderByAppointmentTimeAsc();
+    }
+
+    public String updateAppointment(AppointmentRequest appointment) throws Exception {
+        try {
+            Optional<Appointment> optionalAppointment = appointmentRepository.findById(appointment.getId());
+            if(optionalAppointment.isEmpty()) {
+                throw new ResourceNotFoundException("Appointment not available");
+            } else {
+                DataRequest<Doctor> dataRequestDoctor = doctorFeignClient.getDoctorById(appointment.getDoctorId().toString()).getBody();
+                DataRequest<Patient> dataRequestPatient = patientFeignClient.getPatientById(appointment.getPatientId().toString()).getBody();
+                Appointment updatedAppointment = optionalAppointment.get();
+                updatedAppointment.setDoctor(dataRequestDoctor.getData());
+                updatedAppointment.setPatient(dataRequestPatient.getData());
+                updatedAppointment.setAppointmentTime(appointment.getAppointmentTime());
+                updatedAppointment.setNotes(appointment.getNotes());
+                updatedAppointment.setDoctorComments(appointment.getDoctorComments());
+                updatedAppointment.setStatus(AppointmentStatus.fromValue(appointment.getStatus()));
+                return appointmentRepository.save(updatedAppointment).getId();
+            }
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
         }
-    }
-
-    public List<AppointmentDTO> getByDoctorId(String doctorId) {
-        return appointmentRepository.findByDoctorId(doctorId).stream()
-                .map((this::toDTO)).collect(Collectors.toList());
-    }
-
-    public List<AppointmentDTO> getAllAppointments() {
-        return appointmentRepository.findAll().stream()
-                .map((this::toDTO)).collect(Collectors.toList());
-    }
-
-    public AppointmentDTO updateAppointment(AppointmentDTO appointmentDTO) {
-        return this.toDTO(appointmentRepository.save(this.toModel(appointmentDTO)));
-    }
-
-    public AppointmentDTO toDTO(Appointment appointment) {
-        AppointmentDTO appointmentDTO = new AppointmentDTO();
-        appointmentDTO.setId(appointment.getId());
-        appointmentDTO.setPatientName(appointment.getPatientName());
-        appointmentDTO.setAppointmentTime(appointment.getAppointmentTime());
-        appointmentDTO.setDoctorId(appointment.getDoctorId());
-        appointmentDTO.setStatus(appointment.getStatus());
-        return appointmentDTO;
-    }
-
-    public Appointment toModel(AppointmentDTO appointmentDTO) {
-        Appointment appointment = new Appointment();
-        appointment.setId(appointmentDTO.getId());
-        appointment.setPatientName(appointmentDTO.getPatientName());
-        appointment.setAppointmentTime(appointmentDTO.getAppointmentTime());
-        appointment.setDoctorId(appointmentDTO.getDoctorId());
-        appointment.setStatus(appointmentDTO.getStatus());
-        return appointment;
     }
 }

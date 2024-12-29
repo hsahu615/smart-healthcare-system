@@ -25,8 +25,9 @@
         <module>doctor-service</module>
         <module>appointment-service</module>
 		<module>gateway-service</module>
-		<module>notification-service</module>
-	</modules>
+<!--		<module>notification-service</module>-->
+        <module>patient-service</module>
+    </modules>
     <scm>
 		<connection/>
 		<developerConnection/>

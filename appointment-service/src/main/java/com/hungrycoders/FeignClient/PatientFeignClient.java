@@ -1,6 +1,6 @@
 package com.hungrycoders.FeignClient;
 
-import com.hungrycoders.model.Doctor;
+import com.hungrycoders.model.Patient;
 import com.hungrycoders.payload.request.DataRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.UUID;
 
-@FeignClient(name = "doctor-service", url = "http://localhost:8081/api/v1/doctor")
-public interface DoctorFeignClient {
-
+@FeignClient(name = "patient-service", url = "http://localhost:8082/api/v1/patient")
+public interface PatientFeignClient {
     @GetMapping("/{id}")
-    ResponseEntity<DataRequest<Doctor>> getDoctorById(@PathVariable("id") String id);
+    ResponseEntity<DataRequest<Patient>> getPatientById(@PathVariable("id") String id);
 }

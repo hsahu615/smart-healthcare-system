@@ -14,7 +14,6 @@
     <option name="ignoredFiles">
       <set>
         <option value="$PROJECT_DIR$/api-gateway/pom.xml" />
-        <option value="$PROJECT_DIR$/patient-service/pom.xml" />
       </set>
     </option>
   </component>
