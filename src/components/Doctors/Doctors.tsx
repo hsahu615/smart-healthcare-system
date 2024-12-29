@@ -15,6 +15,7 @@ import {
   getAllAppointmentsByDoctor,
   getAllDoctors,
 } from "../../services/service";
+import { formatDate, isPast } from "../../services/util.service";
 
 const Doctors = () => {
   const [doctors, setDoctors] = useState([]);
@@ -36,15 +37,6 @@ const Doctors = () => {
     setShowModal(true);
   };
   const handleClose = () => setShowModal(false);
-
-  const formatDate = (date) => {
-    const dat = new Date(date);
-    return new Intl.DateTimeFormat("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }).format(dat);
-  };
 
   const handleDelete = (id) => {
     Swal.fire({
@@ -74,7 +66,7 @@ const Doctors = () => {
             border:
               doctor.status.toLowerCase() == "available"
                 ? "2px solid green"
-                : doctor.status.toLowerCase() == "not_unavailable"
+                : doctor.status.toLowerCase() == "not_available"
                 ? "2px solid yellow"
                 : "2px solid red",
           }}
@@ -139,12 +131,13 @@ const Doctors = () => {
                       <div
                         className="card my-2 w-100"
                         style={{
-                          border:
-                            appointment.status === "pending"
-                              ? "2px solid yellow"
-                              : appointment.status === "confirmed"
-                              ? "2px solid green"
-                              : "2px solid red",
+                          border: isPast(appointment.appointmentTime)
+                            ? "2px solid blue"
+                            : appointment.status.toLowerCase() === "pending"
+                            ? "2px solid yellow"
+                            : appointment.status.toLowerCase() === "confirmed"
+                            ? "2px solid green"
+                            : "2px solid red",
                         }}
                       >
                         <div className="card-body">

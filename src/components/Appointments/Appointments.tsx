@@ -47,22 +47,22 @@ const Appointments = () => {
     const role = localStorage.getItem("userRole");
     setCurrentRole(role);
     if (role === "patient")
-      getAllAppointmentsByPatient("f11649ab-fa80-4318-9fcd-db98cd99cf97").then(
+      getAllAppointmentsByPatient("75265e11-337a-4054-a1d1-7b416d5ddec6").then(
         (res: any) => {
-          const aps = res?.data === undefined ? [] : res?.data;
+          const aps = res?.data?.data === undefined ? [] : res?.data?.data;
           setAppointments(aps);
         }
       );
     else if (role === "doctor")
-      getAllAppointmentsByDoctor("cec1719f-e074-42e2-9dc2-fc9fd709347e").then(
+      getAllAppointmentsByDoctor("7f57e292-7eb1-4fdc-9c3c-359eb7fbcea3").then(
         (res: any) => {
-          const aps = res?.data === undefined ? [] : res?.data;
+          const aps = res?.data?.data === undefined ? [] : res?.data?.data;
           setAppointments(aps);
         }
       );
     else
       getAllAppointments().then((res: any) => {
-        const aps = res?.data === undefined ? [] : res?.data;
+        const aps = res?.data?.data === undefined ? [] : res?.data?.data;
         setAppointments(aps);
       });
   };
@@ -210,8 +210,11 @@ const Appointments = () => {
                           <p className="my-1">Phone: {doctor.phone}</p>
                           <p className="my-1">
                             Status:{" "}
-                            {doctor.status[0].toUpperCase() +
-                              doctor.status.substring(1)}
+                            {doctor.status.toLowerCase() === "available"
+                              ? "Available"
+                              : doctor.status.toLowerCase() === "not_available"
+                              ? "Not Available"
+                              : "Left the hospital"}
                           </p>
                         </div>
                       </div>
@@ -349,6 +352,7 @@ const Appointments = () => {
                   )}
                 {/* Receiving new appointment (Confirm or reject) */}
                 {currentRole === "doctor" &&
+                  !isPast(appointment.appointmentTime) &&
                   appointment.status === "PENDING" && (
                     <div>
                       <button className="bg-transparent border-0 p-1">

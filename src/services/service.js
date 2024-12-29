@@ -100,9 +100,18 @@ export async function getAllAppointmentsByPatient(patientId) {
 
 export async function updateAppointment(appointment) {
   try {
+    const data = {
+      id: appointment.id,
+      appointmentTime: appointment.appointmentTime,
+      status: appointment.status,
+      notes: appointment.notes,
+      doctorComments: appointment.doctorComments,
+      patientId: appointment.patient.id,
+      doctorId: appointment.doctor.id,
+    };
     const res = await axios.put(
       `http://localhost:8080/api/v1/appointment/`,
-      appointment,
+      data,
       { method: "PUT" }
     );
     return res;

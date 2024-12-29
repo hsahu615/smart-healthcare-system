@@ -12,12 +12,12 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 function App() {
   return (
     <>
-      <Navbar />
       <Routes>
         <Route
           path="/"
           element={
             <ProtectedRoute roles={["admin", "doctor", "patient"]}>
+              <Navbar />
               <Home />
             </ProtectedRoute>
           }
@@ -28,6 +28,7 @@ function App() {
           path="/newdoctor"
           element={
             <ProtectedRoute roles={["admin"]}>
+              <Navbar />
               <AddDoctor />
             </ProtectedRoute>
           }
@@ -36,6 +37,7 @@ function App() {
           path="/newappointment"
           element={
             <ProtectedRoute roles={["patient"]}>
+              <Navbar />
               <AddAppointment />
             </ProtectedRoute>
           }

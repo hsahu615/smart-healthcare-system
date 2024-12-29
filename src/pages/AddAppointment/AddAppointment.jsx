@@ -2,11 +2,12 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { addAppointment, getAllDoctors } from "../../services/service";
+import { getCurrentTime } from "../../services/util.service";
 
 const AddAppointment = () => {
   const initialAppointment = {
     doctorId: "",
-    patientId: "f11649ab-fa80-4318-9fcd-db98cd99cf97",
+    patientId: "75265e11-337a-4054-a1d1-7b416d5ddec6",
     appointmentTime: "",
     status: "PENDING",
     notes: "",
@@ -14,8 +15,10 @@ const AddAppointment = () => {
   };
   const [appointment, setAppointment] = useState(initialAppointment);
   const [doctors, setDoctors] = useState([]);
+  const [currentTime, setCurrentTime] = useState("2024-12-27T01:19");
 
   useEffect(() => {
+    setCurrentTime(getCurrentTime());
     getAllDoctors().then((res) => {
       const aps = res?.data?.data === undefined ? [] : res?.data?.data;
       setDoctors(aps);
@@ -27,7 +30,7 @@ const AddAppointment = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const appointmentTemp = appointment;
-    appointmentTemp.patientId = "f11649ab-fa80-4318-9fcd-db98cd99cf97";
+    appointmentTemp.patientId = "75265e11-337a-4054-a1d1-7b416d5ddec6";
     addAppointment(appointmentTemp)
       .then((res) => {
         if (res.status === 200) {
@@ -95,6 +98,7 @@ const AddAppointment = () => {
               type="datetime-local"
               className="form-control"
               id="appointmentTime"
+              min={currentTime}
             />
           </div>
           <div className="my-4">

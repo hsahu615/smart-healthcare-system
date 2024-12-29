@@ -1,12 +1,25 @@
 import React, { useEffect, useState } from "react";
 import "./Patients.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCalendar,
+  faClock,
+  faList,
+  faTrash,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
-import { deletePatientById, getAllPatients } from "../../services/service";
+import {
+  deletePatientById,
+  getAllAppointmentsByPatient,
+  getAllPatients,
+} from "../../services/service";
+import { formatDate, isPast } from "../../services/util.service";
 
 const Patients = () => {
   const [patients, setPatients] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
     getAllPatients().then((res: any) => {
@@ -14,6 +27,15 @@ const Patients = () => {
       setPatients(aps);
     });
   }, []);
+
+  const handleShow = (patientId) => {
+    getAllAppointmentsByPatient(patientId).then((res: any) => {
+      const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+      setAppointments(aps);
+    });
+    setShowModal(true);
+  };
+  const handleClose = () => setShowModal(false);
 
   return (
     <div>
@@ -39,8 +61,88 @@ const Patients = () => {
                   </p>
                 </div>
               </div>
+              <div className="d-flex flex-column align-items-center justify-content-between">
+                <button
+                  className="bg-transparent border-0"
+                  onClick={() => handleShow(patient.id)}
+                >
+                  <FontAwesomeIcon icon={faList} />
+                </button>
+              </div>
             </div>
           </div>
+          {showModal && (
+            <div
+              className="modal show d-block"
+              style={{ backgroundColor: "rgba(0,0,0,0.35)" }}
+            >
+              <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">Appointment</h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      onClick={handleClose}
+                    ></button>
+                  </div>
+                  <div className="modal-body">
+                    {appointments.map((appointment: any) => (
+                      <div
+                        className="card my-2 w-100"
+                        style={{
+                          border: isPast(appointment.appointmentTime)
+                            ? "2px solid blue"
+                            : appointment.status.toLowerCase() === "pending"
+                            ? "2px solid yellow"
+                            : appointment.status.toLowerCase() === "confirmed"
+                            ? "2px solid green"
+                            : "2px solid red",
+                        }}
+                      >
+                        <div className="card-body">
+                          <div className="d-flex justify-content-between">
+                            <div>
+                              <h5 className="card-title">
+                                <FontAwesomeIcon
+                                  icon={faUser}
+                                  className="mx-1"
+                                />
+                                {appointment.patient.firstName.trim() +
+                                  " " +
+                                  appointment.patient.lastName.trim()}
+                              </h5>
+                              <div className="d-flex justify-content-between align-items-center">
+                                <p className="card-text m-0">
+                                  <FontAwesomeIcon
+                                    icon={faCalendar}
+                                    className="mx-1"
+                                  />{" "}
+                                  {formatDate(
+                                    appointment.appointmentTime.split("T")[0]
+                                  )}{" "}
+                                  <br />
+                                  <FontAwesomeIcon
+                                    icon={faClock}
+                                    className="mx-1"
+                                  />{" "}
+                                  {appointment.appointmentTime
+                                    .split("T")[1]
+                                    .split(":")
+                                    .slice(0, 2)
+                                    .join(":")}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       ))}
     </div>
