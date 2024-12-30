@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./Doctors.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -16,24 +16,40 @@ import {
   getAllDoctors,
 } from "../../services/service";
 import { formatDate, isPast } from "../../services/util.service";
+import { spinnerContext } from "../Spinner/spinnerContext";
 
 const Doctors = () => {
   const [doctors, setDoctors] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const { setShowSpinner } = useContext(spinnerContext);
 
   useEffect(() => {
-    getAllDoctors().then((res: any) => {
-      const aps = res?.data?.data === undefined ? [] : res?.data?.data;
-      setDoctors(aps);
-    });
+    setShowSpinner(true);
+    getAllDoctors()
+      .then((res: any) => {
+        setShowSpinner(false);
+        const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+        setDoctors(aps);
+      })
+      .catch((err) => {
+        setShowSpinner(false);
+        console.log(err);
+      });
   }, []);
 
   const handleShow = (doctorId) => {
-    getAllAppointmentsByDoctor(doctorId).then((res: any) => {
-      const aps = res?.data?.data === undefined ? [] : res?.data?.data;
-      setAppointments(aps);
-    });
+    setShowSpinner(true);
+    getAllAppointmentsByDoctor(doctorId)
+      .then((res: any) => {
+        setShowSpinner(false);
+        const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+        setAppointments(aps);
+      })
+      .catch((err) => {
+        setShowSpinner(false);
+        console.log(err);
+      });
     setShowModal(true);
   };
   const handleClose = () => setShowModal(false);
@@ -47,12 +63,25 @@ const Doctors = () => {
       showCancelButton: true,
     }).then((value) => {
       if (value.isConfirmed) {
-        deleteDoctorById(id).then(() => {
-          getAllDoctors().then((res: any) => {
-            const aps = res?.data?.data === undefined ? [] : res?.data?.data;
-            setDoctors(aps);
+        setShowSpinner(true);
+        deleteDoctorById(id)
+          .then(() => {
+            getAllDoctors()
+              .then((res: any) => {
+                setShowSpinner(false);
+                const aps =
+                  res?.data?.data === undefined ? [] : res?.data?.data;
+                setDoctors(aps);
+              })
+              .catch((err) => {
+                setShowSpinner(false);
+                console.log(err);
+              });
+          })
+          .catch((err) => {
+            setShowSpinner(false);
+            console.log(err);
           });
-        });
       }
     });
   };
@@ -100,7 +129,7 @@ const Doctors = () => {
                 >
                   <FontAwesomeIcon icon={faList} />
                 </button>
-                {doctor.status !== "disabled" && (
+                {doctor.status.toLowerCase() !== "disabled" && (
                   <button
                     className="bg-transparent border-0"
                     onClick={() => handleDelete(doctor.id)}

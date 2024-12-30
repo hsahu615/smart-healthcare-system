@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./Patients.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -8,31 +8,45 @@ import {
   faTrash,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
-import Swal from "sweetalert2";
 import {
-  deletePatientById,
   getAllAppointmentsByPatient,
   getAllPatients,
 } from "../../services/service";
+import { spinnerContext } from "../Spinner/spinnerContext";
 import { formatDate, isPast } from "../../services/util.service";
 
 const Patients = () => {
   const [patients, setPatients] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [appointments, setAppointments] = useState([]);
+  const { setShowSpinner } = useContext(spinnerContext);
 
   useEffect(() => {
-    getAllPatients().then((res: any) => {
-      const aps = res?.data?.data === undefined ? [] : res?.data?.data;
-      setPatients(aps);
-    });
+    setShowSpinner(true);
+    getAllPatients()
+      .then((res: any) => {
+        setShowSpinner(false);
+        const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+        setPatients(aps);
+      })
+      .catch((err) => {
+        setShowSpinner(false);
+        console.log(err);
+      });
   }, []);
 
   const handleShow = (patientId) => {
-    getAllAppointmentsByPatient(patientId).then((res: any) => {
-      const aps = res?.data?.data === undefined ? [] : res?.data?.data;
-      setAppointments(aps);
-    });
+    setShowSpinner(true);
+    getAllAppointmentsByPatient(patientId)
+      .then((res: any) => {
+        setShowSpinner(false);
+        const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+        setAppointments(aps);
+      })
+      .catch((err) => {
+        setShowSpinner(false);
+        console.log(err);
+      });
     setShowModal(true);
   };
   const handleClose = () => setShowModal(false);

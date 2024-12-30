@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./Navbar.css";
 import { Link } from "react-router-dom";
+import { AuthContext } from "../../auth/AuthContext";
 
 const Navbar = () => {
   const [currentRole, setCurrentRole] = useState<any>("");
+  const { user, logout } = useContext<any>(AuthContext);
   useEffect(() => {
     const userRole = localStorage.getItem("userRole");
     setCurrentRole(userRole);
@@ -17,7 +19,7 @@ const Navbar = () => {
         <Link to="/" className="text-decoration-none text-white mx-2">
           Home
         </Link>
-        {currentRole === "admin" && (
+        {currentRole === "ROLE_ADMIN" && (
           <Link
             to="/newdoctor"
             className="text-decoration-none text-white mx-2"
@@ -25,7 +27,7 @@ const Navbar = () => {
             New Doctor
           </Link>
         )}
-        {currentRole === "patient" && (
+        {currentRole === "ROLE_PATIENT" && (
           <Link
             to="/newappointment"
             className="text-decoration-none text-white mx-2"
@@ -33,6 +35,15 @@ const Navbar = () => {
             New Appointment
           </Link>
         )}
+        {currentRole === "ROLE_ADMIN" && (
+          <span className="text-white">Hi, Admin</span>
+        )}
+        {currentRole !== "ROLE_ADMIN" && (
+          <span className="text-white">Hi, {user?.firstName}</span>
+        )}
+        <button className="bg-white text-black p-2 btn mx-4" onClick={logout}>
+          Logout
+        </button>
       </div>
     </div>
   );

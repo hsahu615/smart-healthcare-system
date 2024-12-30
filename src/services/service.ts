@@ -1,7 +1,8 @@
 import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
 export const addAppointment = async (appointment) => {
-  const res = await axios.post(
+  const res = await axiosInstance.post(
     "http://localhost:8080/api/v1/appointment",
     appointment
   );
@@ -9,23 +10,30 @@ export const addAppointment = async (appointment) => {
 };
 
 export const addDoctor = async (doctor) => {
-  const res = await axios.post("http://localhost:8081/api/v1/doctor/", doctor);
+  const res = await axiosInstance.post(
+    "http://localhost:8081/api/v1/doctor/",
+    doctor
+  );
   return res;
 };
 
 export const getAllDoctors = async () => {
-  const jsonData = await axios.get("http://localhost:8081/api/v1/doctor/all");
+  const jsonData = await axiosInstance.get(
+    "http://localhost:8081/api/v1/doctor/all"
+  );
   return jsonData;
 };
 
 export const getAllPatients = async () => {
-  const jsonData = await axios.get("http://localhost:8082/api/v1/patient/all");
+  const jsonData = await axiosInstance.get(
+    "http://localhost:8082/api/v1/patient/all"
+  );
   return jsonData;
 };
 
 export const deleteDoctorById = async (doctorId) => {
   try {
-    const dltrequest = await axios.delete(
+    const dltrequest = await axiosInstance.delete(
       `http://localhost:8081/api/v1/doctor/${doctorId}`,
       {
         method: "DELETE",
@@ -38,7 +46,7 @@ export const deleteDoctorById = async (doctorId) => {
 
 export async function deleteAppointmentById(appointmentId) {
   try {
-    const dltrequest = await axios.delete(
+    const dltrequest = await axiosInstance.delete(
       `http://localhost:8080/api/v1/appointment/${appointmentId}`
     );
     return dltrequest;
@@ -49,7 +57,7 @@ export async function deleteAppointmentById(appointmentId) {
 
 export async function deletePatientById(patientId) {
   try {
-    const dltrequest = await axios.delete(
+    const dltrequest = await axiosInstance.delete(
       `http://localhost:8081/api/v1/patient/${patientId}`
     );
     return dltrequest;
@@ -60,7 +68,7 @@ export async function deletePatientById(patientId) {
 
 export async function getDoctorById(doctorId) {
   try {
-    const doctor = await axios.get(
+    const doctor = await axiosInstance.get(
       `http://localhost:8081/api/v1/doctor/${doctorId}`
     );
     return doctor;
@@ -70,7 +78,7 @@ export async function getDoctorById(doctorId) {
 }
 
 export const getAllAppointments = async () => {
-  const jsonData = await axios.get(
+  const jsonData = await axiosInstance.get(
     "http://localhost:8080/api/v1/appointment/all"
   );
   return jsonData;
@@ -78,7 +86,7 @@ export const getAllAppointments = async () => {
 
 export async function getAllAppointmentsByDoctor(doctorId) {
   try {
-    const doctors = await axios.get(
+    const doctors = await axiosInstance.get(
       `http://localhost:8080/api/v1/appointment/doctor/${doctorId}`
     );
     return doctors;
@@ -89,7 +97,7 @@ export async function getAllAppointmentsByDoctor(doctorId) {
 
 export async function getAllAppointmentsByPatient(patientId) {
   try {
-    const patients = await axios.get(
+    const patients = await axiosInstance.get(
       `http://localhost:8080/api/v1/appointment/patient/${patientId}`
     );
     return patients;
@@ -109,7 +117,7 @@ export async function updateAppointment(appointment) {
       patientId: appointment.patient.id,
       doctorId: appointment.doctor.id,
     };
-    const res = await axios.put(
+    const res = await axiosInstance.put(
       `http://localhost:8080/api/v1/appointment/`,
       data,
       { method: "PUT" }
@@ -122,7 +130,7 @@ export async function updateAppointment(appointment) {
 
 export async function updateDoctor(doctor, id) {
   try {
-    const res = await axios.patch(
+    const res = await axiosInstance.patch(
       `http://localhost:8081/api/v1/doctor/${id}`,
       doctor,
       { method: "PUT" }

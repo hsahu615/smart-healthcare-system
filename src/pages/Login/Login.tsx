@@ -1,15 +1,34 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
+import { AuthContext } from "../../auth/AuthContext";
+import axiosInstance from "../../services/axiosInstance";
+import { navigateTo } from "../../services/navigateUtil";
+import { spinnerContext } from "../../components/Spinner/spinnerContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { login } = useContext<any>(AuthContext);
+  const { setShowSpinner } = useContext(spinnerContext);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
-    console.log("Email:", email);
-    console.log("Password:", password);
-    // Add authentication logic here
+    try {
+      setShowSpinner(true);
+      const response = await axiosInstance
+        .post("http://localhost:8081/api/v1/doctor/signin", {
+          username: email,
+          password: password,
+        })
+        .finally(() => {
+          setShowSpinner(false);
+        });
+      login(response.data.data);
+    } catch (error) {
+      setShowSpinner(false);
+      navigateTo("/login");
+    }
   };
+
   return (
     <div>
       <div
@@ -19,6 +38,7 @@ const Login = () => {
         <div className="modal-dialog modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-body">
+              <h4 className="mb-3 text-center">LOGIN</h4>
               <div className="row justify-content-center">
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
@@ -49,7 +69,7 @@ const Login = () => {
                       required
                     />
                   </div>
-                  <button type="submit" className="btn btn-success w-100">
+                  <button type="submit" className="btn btn-dark w-100">
                     Login
                   </button>
                 </form>

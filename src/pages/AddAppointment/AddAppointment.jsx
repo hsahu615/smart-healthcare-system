@@ -1,38 +1,58 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import { addAppointment, getAllDoctors } from "../../services/service";
 import { getCurrentTime } from "../../services/util.service";
+import { AuthContext } from "../../auth/AuthContext";
+import { spinnerContext } from "../../components/Spinner/spinnerContext";
 
 const AddAppointment = () => {
+  const { setShowSpinner } = useContext(spinnerContext);
+  const [doctors, setDoctors] = useState([]);
+  const [currentTime, setCurrentTime] = useState(Date.now());
+  const { user } = useContext(AuthContext);
   const initialAppointment = {
     doctorId: "",
-    patientId: "75265e11-337a-4054-a1d1-7b416d5ddec6",
+    patientId: user?.id,
     appointmentTime: "",
     status: "PENDING",
     notes: "",
     doctorComments: "",
   };
   const [appointment, setAppointment] = useState(initialAppointment);
-  const [doctors, setDoctors] = useState([]);
-  const [currentTime, setCurrentTime] = useState("2024-12-27T01:19");
 
   useEffect(() => {
     setCurrentTime(getCurrentTime());
-    getAllDoctors().then((res) => {
-      const aps = res?.data?.data === undefined ? [] : res?.data?.data;
-      setDoctors(aps);
-      if (aps?.length > 0) initialAppointment.doctorId = aps[0].id;
-      setAppointment(initialAppointment);
-    });
+    setShowSpinner(true);
+    getAllDoctors()
+      .then((res) => {
+        setShowSpinner(false);
+        const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+        setDoctors(aps.filter((doctor) => doctor.status === "AVAILABLE"));
+        if (aps?.length > 0) initialAppointment.doctorId = aps[0].id;
+        setAppointment(initialAppointment);
+      })
+      .catch((e) => {
+        setShowSpinner(false);
+      });
   }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (doctors.length === 0) {
+      Swal.fire({
+        title: "Sorry, No Doctors available",
+        timer: 2000,
+        icon: "info",
+      });
+      return;
+    }
     const appointmentTemp = appointment;
-    appointmentTemp.patientId = "75265e11-337a-4054-a1d1-7b416d5ddec6";
+    appointmentTemp.patientId = user?.id;
+    setShowSpinner(true);
     addAppointment(appointmentTemp)
       .then((res) => {
+        setShowSpinner(false);
         if (res.status === 200) {
           Swal.fire({
             title: "Success",
@@ -43,6 +63,7 @@ const AddAppointment = () => {
         handleReset();
       })
       .catch((e) => {
+        setShowSpinner(false);
         Swal.fire({
           title: "Failed",
           text: "Error encountered",
@@ -76,14 +97,20 @@ const AddAppointment = () => {
               className="form-select"
               onChange={handleChange}
               id="doctorId"
+              disabled={doctors.length === 0}
             >
-              {doctors.map(
-                (doctor) =>
-                  doctor.status.toLowerCase() === "available" && (
-                    <option value={doctor.id}>
-                      {doctor.firstName.trim() + " " + doctor.lastName.trim()}
-                    </option>
-                  )
+              {doctors.length > 0 &&
+                doctors.map(
+                  (doctor) =>
+                    doctor.status.toLowerCase() === "available" && (
+                      <option value={doctor.id}>
+                        {doctor.firstName.trim() + " " + doctor.lastName.trim()}
+                      </option>
+                    )
+                )}
+
+              {doctors.length === 0 && (
+                <option unselectable="on">Sorry, No Doctors available</option>
               )}
             </select>
           </div>

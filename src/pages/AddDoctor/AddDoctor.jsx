@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import "./AddDoctor.css";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { addDoctor } from "../../services/service";
+import { spinnerContext } from "../../components/Spinner/spinnerContext";
 
 const AddDoctor = () => {
   const initialDoctor = {
@@ -15,12 +16,15 @@ const AddDoctor = () => {
     status: "AVAILABLE",
   };
   const [doctor, setDoctor] = useState(initialDoctor);
+  const { setShowSpinner } = useContext(spinnerContext);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(doctor);
+    setShowSpinner(true);
     addDoctor(doctor)
       .then((res) => {
+        setShowSpinner(false);
         if (res.status === 200) {
           Swal.fire({
             title: "Success",
@@ -31,6 +35,7 @@ const AddDoctor = () => {
         handleReset();
       })
       .catch(() => {
+        setShowSpinner(false);
         Swal.fire({
           title: "Failed",
           text: "Error encountered",

@@ -1,25 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./Home.css";
 import Appointments from "../../components/Appointments/Appointments";
 import Doctors from "../../components/Doctors/Doctors";
 import Patients from "../../components/Patients/Patients";
 import { updateDoctor } from "../../services/service";
 import Swal from "sweetalert2";
+import { AuthContext } from "../../auth/AuthContext";
+import { spinnerContext } from "../../components/Spinner/spinnerContext";
 
 const Home = () => {
   const [currentSection, setCurrentSection] = useState("Appointments");
-  const [currentRole, setCurrentRole] = useState<any>("");
-  const [user, setUser] = useState<any>(null);
   const [doctorAvailability, setDoctorAvailability] = useState(false);
+  const { user, currentRole } = useContext<any>(AuthContext);
+  const { setShowSpinner } = useContext(spinnerContext);
 
   useEffect(() => {
-    const role = localStorage.getItem("userRole");
-    const jsonUser = localStorage.getItem("user");
-    const user: any = JSON.parse(jsonUser ? jsonUser : "{}");
-    setCurrentRole(role);
-    setUser(user);
-    if (role === "doctor") setDoctorAvailability(user.status === "AVAILABLE");
-  }, []);
+    if (currentRole === "ROLE_DOCTOR")
+      setDoctorAvailability(user?.status === "AVAILABLE");
+  }, [currentRole, user]);
 
   const handleSectionChange = (e) => {
     setCurrentSection(e.target.value);
@@ -35,22 +33,29 @@ const Home = () => {
       yearsOfExperience: user.yearsOfExperience,
       status: doctorAvailability ? "NOT_AVAILABLE" : "AVAILABLE",
     };
-    updateDoctor(doctorPayload, user.id).then((res: any) => {
-      if (res.status === 200) {
-        setDoctorAvailability(!doctorAvailability);
-      } else {
-        Swal.fire({
-          title: "Error",
-          text: "Not Updated!",
-          icon: "error",
-        });
-      }
-    });
+    setShowSpinner(true);
+    updateDoctor(doctorPayload, user.id)
+      .then((res: any) => {
+        setShowSpinner(false);
+        if (res.status === 200) {
+          setDoctorAvailability(!doctorAvailability);
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: "Not Updated!",
+            icon: "error",
+          });
+        }
+      })
+      .catch((err) => {
+        setShowSpinner(false);
+        console.log(err);
+      });
   };
 
   return (
     <div className="content-wrapper d-flex m-0 align-items-center justify-content-center">
-      <div className="w-50">
+      <div className="w-50" style={{ maxHeight: "80vh", overflowY: "auto" }}>
         <div className="d-flex m-0 align-items-center justify-content-between">
           <select
             className="form-select w-25"
@@ -58,15 +63,15 @@ const Home = () => {
             defaultValue={currentSection}
             onChange={handleSectionChange}
           >
-            {currentRole === "admin" && (
+            {currentRole === "ROLE_ADMIN" && (
               <option value="Doctors">Doctors</option>
             )}
             <option value="Appointments">Appointments</option>
-            {currentRole === "admin" && (
+            {currentRole === "ROLE_ADMIN" && (
               <option value="Patients">Patients</option>
             )}
           </select>
-          {currentRole === "doctor" && (
+          {currentRole === "ROLE_DOCTOR" && (
             <div className="form-check d-inline">
               <input
                 className="form-check-input"

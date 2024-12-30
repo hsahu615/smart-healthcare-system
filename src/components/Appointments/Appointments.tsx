@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./Appointments.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -20,24 +20,15 @@ import {
   updateAppointment,
 } from "../../services/service";
 import Swal from "sweetalert2";
+import { spinnerContext } from "../Spinner/spinnerContext";
 
 const Appointments = () => {
   const [appointments, setAppointments] = useState<any>([]);
   const [doctor, setDoctor] = useState<any>({});
-  const [updatedAppointment, setUpdatedAppointment] = useState<any>({
-    appointmentTime: "",
-    status: "pending",
-    patientComments: "",
-    doctorComments: "",
-    patient: {
-      firstName: "",
-      lastName: "",
-      age: 0,
-    },
-  });
   const [showModal, setShowModal] = useState(false);
   const [updateModal, setUpdateModal] = useState(false);
   const [currentRole, setCurrentRole] = useState<any>("");
+  const { setShowSpinner } = useContext(spinnerContext);
 
   useEffect(() => {
     fetchData();
@@ -46,25 +37,40 @@ const Appointments = () => {
   const fetchData = () => {
     const role = localStorage.getItem("userRole");
     setCurrentRole(role);
-    if (role === "patient")
-      getAllAppointmentsByPatient("75265e11-337a-4054-a1d1-7b416d5ddec6").then(
-        (res: any) => {
+    setShowSpinner(true);
+    if (role === "ROLE_PATIENT")
+      getAllAppointmentsByPatient("75265e11-337a-4054-a1d1-7b416d5ddec6")
+        .then((res: any) => {
+          setShowSpinner(false);
           const aps = res?.data?.data === undefined ? [] : res?.data?.data;
           setAppointments(aps);
-        }
-      );
-    else if (role === "doctor")
-      getAllAppointmentsByDoctor("7f57e292-7eb1-4fdc-9c3c-359eb7fbcea3").then(
-        (res: any) => {
+        })
+        .catch((err) => {
+          setShowSpinner(false);
+          console.log(err);
+        });
+    else if (role === "ROLE_DOCTOR")
+      getAllAppointmentsByDoctor("7f57e292-7eb1-4fdc-9c3c-359eb7fbcea3")
+        .then((res: any) => {
+          setShowSpinner(false);
           const aps = res?.data?.data === undefined ? [] : res?.data?.data;
           setAppointments(aps);
-        }
-      );
+        })
+        .catch((err) => {
+          setShowSpinner(false);
+          console.log(err);
+        });
     else
-      getAllAppointments().then((res: any) => {
-        const aps = res?.data?.data === undefined ? [] : res?.data?.data;
-        setAppointments(aps);
-      });
+      getAllAppointments()
+        .then((res: any) => {
+          setShowSpinner(false);
+          const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+          setAppointments(aps);
+        })
+        .catch((err) => {
+          setShowSpinner(false);
+          console.log(err);
+        });
   };
 
   const handleShow = (doctor: any) => {
@@ -74,7 +80,6 @@ const Appointments = () => {
   const handleClose = () => setShowModal(false);
 
   const updateModalShow = (appointment: any) => {
-    setUpdatedAppointment(appointment);
     setUpdateModal(true);
   };
   const updateClose = () => setUpdateModal(false);
@@ -96,45 +101,66 @@ const Appointments = () => {
 
   const updateAppointmentStatus = (appointment, status) => {
     appointment.status = status;
-    updateAppointment(appointment).then((res: any) => {
-      if (res.status === 200) fetchData();
-      else
-        Swal.fire({
-          title: "Error",
-          text: "Failed to update",
-          icon: "error",
-        });
-    });
+    setShowSpinner(true);
+    updateAppointment(appointment)
+      .then((res: any) => {
+        setShowSpinner(false);
+        if (res.status === 200) fetchData();
+        else
+          Swal.fire({
+            title: "Error",
+            text: "Failed to update",
+            icon: "error",
+          });
+      })
+      .catch((err) => {
+        setShowSpinner(false);
+        console.log(err);
+      });
   };
 
   const updateAfterCheckup = (appointment, e) => {
     e.preventDefault();
     appointment.doctorComments = e.target[3].value;
-    updateAppointment(appointment).then((res: any) => {
-      if (res.status === 200) {
-        fetchData();
-        updateClose();
-      } else
-        Swal.fire({
-          title: "Error",
-          text: "Failed to update",
-          icon: "error",
-        });
-    });
+    setShowSpinner(true);
+    updateAppointment(appointment)
+      .then((res: any) => {
+        setShowSpinner(false);
+        if (res.status === 200) {
+          fetchData();
+          updateClose();
+        } else
+          Swal.fire({
+            title: "Error",
+            text: "Failed to update",
+            icon: "error",
+          });
+      })
+      .catch((err) => {
+        setShowSpinner(false);
+        console.log(err);
+      });
   };
 
   const deleteAppointment = (appointment) => {
     appointment.status = "REJECTED";
-    updateAppointment(appointment).then((res: any) => {
-      if (res.status === 200) {
-        fetchData();
-      } else
-        Swal.fire({
-          title: "Error",
-          text: "Failed to update",
-          icon: "error",
-        });
-    });
+    setShowSpinner(true);
+    updateAppointment(appointment)
+      .then((res: any) => {
+        setShowSpinner(false);
+        if (res.status === 200) {
+          fetchData();
+        } else
+          Swal.fire({
+            title: "Error",
+            text: "Failed to update",
+            icon: "error",
+          });
+      })
+      .catch((err) => {
+        setShowSpinner(false);
+        console.log(err);
+      });
   };
 
   return (
@@ -317,7 +343,7 @@ const Appointments = () => {
                   </div>
                 )}
                 {/* Show Doctor button for non doctor roles to view doctor details */}
-                {currentRole !== "doctor" && (
+                {currentRole !== "ROLE_DOCTOR" && (
                   <button className="bg-transparent border-0 p-1">
                     <FontAwesomeIcon
                       icon={faUserDoctor}
@@ -326,7 +352,7 @@ const Appointments = () => {
                     />
                   </button>
                 )}
-                {currentRole === "patient" &&
+                {currentRole === "ROLE_PATIENT" &&
                   !isPast(appointment.appointmentTime) &&
                   appointment.status !== "REJECTED" && (
                     <button className="bg-transparent border-0 p-1">
@@ -338,7 +364,7 @@ const Appointments = () => {
                     </button>
                   )}
                 {/* At the time of patient screening doctor leaves comments */}
-                {currentRole === "doctor" &&
+                {currentRole === "ROLE_DOCTOR" &&
                   !isPast(appointment.appointmentTime) &&
                   appointment.status === "CONFIRMED" &&
                   appointment?.doctorComments?.length === 0 && (
@@ -351,7 +377,7 @@ const Appointments = () => {
                     </button>
                   )}
                 {/* Receiving new appointment (Confirm or reject) */}
-                {currentRole === "doctor" &&
+                {currentRole === "ROLE_DOCTOR" &&
                   !isPast(appointment.appointmentTime) &&
                   appointment.status === "PENDING" && (
                     <div>
