@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
 import { setNavigate } from "../services/navigateUtil";
-import axiosInstance from "../services/axiosInstance";
+import { getDoctorByEmail, getPatientByEmail } from "../services/service";
 
 const AuthProvider = ({ children }: any) => {
   const [user, setUser] = useState(localStorage.getItem("user") || null);
@@ -30,17 +30,15 @@ const AuthProvider = ({ children }: any) => {
   const fetchUser = async (email) => {
     try {
       if (userRole === "ROLE_DOCTOR") {
-        const res = await axiosInstance.get(
-          `http://localhost:8081/api/v1/doctor/email/${auth?.email}`
-        );
-        setUser(res.data.data);
-        localStorage.setItem("user", JSON.stringify(res.data.data));
+        getDoctorByEmail(email).then((res) => {
+          setUser(res?.data?.data);
+          localStorage.setItem("user", JSON.stringify(res?.data?.data));
+        });
       } else if (userRole === "ROLE_PATIENT") {
-        const res = await axiosInstance.get(
-          `http://localhost:8082/api/v1/patient/email/${auth?.email}`
-        );
-        setUser(res.data.data);
-        localStorage.setItem("user", JSON.stringify(res.data.data));
+        getPatientByEmail(email).then((res) => {
+          setUser(res?.data?.data);
+          localStorage.setItem("user", JSON.stringify(res?.data?.data));
+        });
       }
     } catch (e) {
       console.log(e);

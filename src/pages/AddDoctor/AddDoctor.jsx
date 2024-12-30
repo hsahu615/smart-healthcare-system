@@ -1,6 +1,4 @@
 import React, { useContext, useState } from "react";
-import "./AddDoctor.css";
-import axios from "axios";
 import Swal from "sweetalert2";
 import { addDoctor } from "../../services/service";
 import { spinnerContext } from "../../components/Spinner/spinnerContext";

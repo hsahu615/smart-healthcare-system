@@ -1,5 +1,15 @@
-import axios from "axios";
 import axiosInstance from "./axiosInstance";
+
+export const signIn = async (username, password) => {
+  const response = await axiosInstance.post(
+    "http://localhost:8081/api/v1/doctor/signin",
+    {
+      username: username,
+      password: password,
+    }
+  );
+  return response;
+};
 
 export const addAppointment = async (appointment) => {
   const res = await axiosInstance.post(
@@ -74,6 +84,28 @@ export async function getDoctorById(doctorId) {
     return doctor;
   } catch (e) {
     console.log("error");
+  }
+}
+
+export async function getDoctorByEmail(email: any) {
+  try {
+    const res = await axiosInstance.get(
+      `http://localhost:8081/api/v1/doctor/email/${email}`
+    );
+    return res;
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function getPatientByEmail(email: any) {
+  try {
+    const res = await axiosInstance.get(
+      `http://localhost:8082/api/v1/patient/email/${email}`
+    );
+    return res;
+  } catch (e) {
+    console.log(e);
   }
 }
 
