@@ -51,6 +51,16 @@ public class PatientService {
         return patient.get();
     }
 
+    public Patient getPatientByEmail(String email) throws ResourceNotFoundException {
+        Optional<Patient> patient = patientRepository.findByEmail(email);
+        if(patient.isEmpty()) {
+            logger.error("Doctor not found with email: {}", email);
+            throw new ResourceNotFoundException("patient not found");
+        }
+        logger.info("Doctor fetched successfully with email: {}", email);
+        return patient.get();
+    }
+
     public Patient updatePatientById(String id, com.hungrycoders.payload.request.Patient patient) throws ResourceNotFoundException {
         UUID uuid = UUID.fromString(id); // Convert String to UUID
 
