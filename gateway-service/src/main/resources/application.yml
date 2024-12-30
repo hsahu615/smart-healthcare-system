@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: gateway-service
+
+  main:
+    web-application-type: reactive
+
+  logging:
+    level:
+      org:
+        springframework:
+          web: DEBUG
+          servlet: DEBUG
+
+server:
+  port: ${GATEWAY_SERVICE_PORT:8081}
+
+jwtSecret: aHR0cHM6Ly93d3cueW91YmlsdW1hbWVyaWNhLmNvbS9sb2dpbi8=
+jwtExpirationMs: 86400000

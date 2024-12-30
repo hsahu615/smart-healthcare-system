@@ -52,8 +52,8 @@ public class GatewayConfig {
                         .uri("http://appointment-service:8080")) // Correct URI for appointment-service
 
                 // Route configuration for auth-service
-                .route("auth-service", r -> r.path("/auth/**")
-                        .filters(f -> f.filter(filter)
+                .route("auth-service", r -> r.path("api/auth/**")
+                        .filters(f -> f
                                 .circuitBreaker(config -> config
                                         .setName("authServiceCircuitBreaker")
                                         .setFallbackUri("forward:/fallback/auth")))
