@@ -39,6 +39,22 @@ public class PatientController {
 
     }
 
+    @GetMapping("/email/{email}")
+    public ResponseEntity<?> getPatientByEmail(@PathVariable String email) throws ResourceNotFoundException {
+        try {
+            com.hungrycoders.model.Patient patient = patientService.getPatientByEmail(email);
+            return ResponseEntity.status(200).body(new GenericResponse<>("Patient fetched successfully", patient));
+        } catch (Exception e) {
+            logger.error("Error fetching patient with email: {} {}", email, e.getMessage());
+            String errorMessage = "Error fetching patient's details";
+            if (e.getMessage() != null && !e.getMessage().isBlank()) {
+                errorMessage += ": " + e.getMessage();
+            }
+            return ResponseEntity.status(500).body(new GenericResponse<>(errorMessage));
+        }
+
+    }
+
     @GetMapping("/all")
     public ResponseEntity<?> getAllPatients() throws Exception {
         try {
