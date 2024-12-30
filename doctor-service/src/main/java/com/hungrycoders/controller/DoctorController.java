@@ -11,7 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(originPatterns = "*")
@@ -27,7 +30,7 @@ public class DoctorController {
     public ResponseEntity<?> getDoctorById(@PathVariable String id) throws ResourceNotFoundException {
         try {
             Doctor doctor = doctorService.getDoctorById(id);
-            return ResponseEntity.status(200).body(new GenericResponse<>("Doctor fetched successfully", doctorService.getDoctorById(id)));
+            return ResponseEntity.status(200).body(new GenericResponse<>("Doctor fetched successfully", doctor));
         } catch (Exception e) {
             logger.error("Error fetching doctor with id: {} {}", id, e.getMessage());
             String errorMessage = "Error fetching doctor's details";
@@ -37,6 +40,21 @@ public class DoctorController {
             return ResponseEntity.status(500).body(new GenericResponse<>(errorMessage));
         }
 
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<?> getDoctorByEmail(@PathVariable String email) throws ResourceNotFoundException {
+        try {
+            Doctor doctor = doctorService.getDoctorByEmail(email);
+            return ResponseEntity.status(200).body(new GenericResponse<>("Doctor fetched successfully", doctor));
+        } catch (Exception e) {
+            logger.error("Error fetching doctor with email: {} {}", email, e.getMessage());
+            String errorMessage = "Error fetching doctor's details";
+            if (e.getMessage() != null && !e.getMessage().isBlank()) {
+                errorMessage += ": " + e.getMessage();
+            }
+            return ResponseEntity.status(500).body(new GenericResponse<>(errorMessage));
+        }
     }
 
     @GetMapping("/all")
