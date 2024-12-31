@@ -4,8 +4,12 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     consumer:
-      group-id: my-group
-      auto-offset-reset: earliest
+      group-id: appointment-notification-group # Matches the group ID in your KafkaListener
+      auto-offset-reset: earliest # Ensures the consumer reads from the beginning if no offset is committed
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      properties:
+        enable.auto.commit: false # Ensures manual control over message acknowledgment if needed
 
 server:
   port: 8083

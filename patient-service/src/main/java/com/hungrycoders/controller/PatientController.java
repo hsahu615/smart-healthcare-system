@@ -76,7 +76,7 @@ public class PatientController {
             com.hungrycoders.model.Patient savedPatient = patientService.addPatient(patient);
             return ResponseEntity.status(200).body(new GenericResponse<>("Patient saved successfully", savedPatient));
         } catch(Exception e) {
-            logger.error("Error saving patient: " + e.getMessage());
+            logger.error("Error saving patient: {}", e.getMessage());
             return ResponseEntity.status(500).body(new GenericResponse<>("Error saving patient"));
         }
 
