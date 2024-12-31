@@ -2,9 +2,24 @@ spring:
     application:
         name: appointment-service
 
-    data:
-        mongodb:
-            uri: ${MONGO_URI}
+data:
+    mongodb:
+        uri: mongodb://root:rootpassword@localhost:27017/healthcare?authSource=admin
+
+logging:
+    level:
+        org:
+            springframework:
+                web: DEBUG
+                servlet: DEBUG
 
 server:
-    port: ${APPOINTMENT_SERVICE_PORT}
+    port: ${APPOINTMENT_SERVICE_PORT:8081}
+
+doctor:
+    service:
+        url: http://doctor-service:8080/api/v1/doctor
+
+patient:
+    service:
+        url: http://patient-service:8080/api/v1/patient

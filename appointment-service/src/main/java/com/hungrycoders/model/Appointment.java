@@ -8,18 +8,23 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 
+/**
+ * Represents an appointment entity with details about doctor, patient, and status.
+ */
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Document(collection = "appointment")
 public class Appointment {
+
     @Id
     private String id;
+
     private Patient patient;
     private Doctor doctor;
     private LocalDateTime appointmentTime;
-    private AppointmentStatus status; // e.g., "pending", "confirmed", "rejected"
+    private AppointmentStatus status; // PENDING, CONFIRMED, REJECTED, COMPLETED
     private String notes;
     private String doctorComments;
 }

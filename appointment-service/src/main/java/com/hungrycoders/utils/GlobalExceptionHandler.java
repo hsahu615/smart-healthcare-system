@@ -1,7 +1,6 @@
 package com.hungrycoders.utils;
 
 import com.hungrycoders.exception.InvalidAppointmentStatusException;
-import com.hungrycoders.payload.response.GenericResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -13,12 +12,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Global exception handler to manage application-wide errors and provide meaningful responses.
+ */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // Handle validation errors
+    /**
+     * Handles validation errors for method arguments.
+     *
+     * @param ex the MethodArgumentNotValidException thrown during validation.
+     * @return a ResponseEntity containing error details.
+     */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<GenericResponse<List<String>>> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    public ResponseEntity<List<String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
 
         // Extract error messages from binding result
@@ -32,13 +39,17 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.toList());
 
         // Return the error response
-        return new ResponseEntity<>(new GenericResponse<>("Validation failed", errors), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    // Handle invalid enum value during deserialization
+    /**
+     * Handles invalid enum values during deserialization.
+     *
+     * @param ex the InvalidAppointmentStatusException thrown for invalid enum values.
+     * @return a ResponseEntity containing error details.
+     */
     @ExceptionHandler(InvalidAppointmentStatusException.class)
-    public ResponseEntity<GenericResponse<String>> handleInvalidDoctorStatusException(InvalidAppointmentStatusException ex) {
-        return new ResponseEntity<>(new GenericResponse<>("Validation failed: " + ex.getMessage()), HttpStatus.BAD_REQUEST);
+    public ResponseEntity<String> handleInvalidAppointmentStatusException(InvalidAppointmentStatusException ex) {
+        return new ResponseEntity<>("Validation failed: " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
-
 }

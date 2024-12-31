@@ -3,8 +3,6 @@ package com.hungrycoders.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hungrycoders.model.Doctor;
 import com.hungrycoders.model.Patient;
-import com.hungrycoders.FeignClient.DoctorFeignClient;
-import com.hungrycoders.FeignClient.PatientFeignClient;
 import com.hungrycoders.model.Appointment;
 import com.hungrycoders.exception.ResourceNotFoundException;
 import com.hungrycoders.model.AppointmentStatus;
@@ -14,71 +12,131 @@ import com.hungrycoders.repository.AppointmentRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.beans.factory.annotation.Value;
+
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
+/**
+ * Service class to handle appointment-related business logic.
+ * Manages booking, retrieval, and updating of appointments.
+ */
 @Service
 public class AppointmentService {
+
     @Autowired
     private AppointmentRepo appointmentRepository;
 
     @Autowired
-    private DoctorFeignClient doctorFeignClient;
+    private RestTemplate restTemplate;
 
-    @Autowired
-    private PatientFeignClient patientFeignClient;
+    @Value("${doctor.service.url}")
+    private String doctorServiceUrl;
 
+    @Value("${patient.service.url}")
+    private String patientServiceUrl;
 
+    /**
+     * Books a new appointment by validating doctor and patient information.
+     *
+     * @param appointment the appointment request details.
+     * @return the ID of the newly created appointment.
+     */
     public String bookAppointment(AppointmentRequest appointment) {
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
-            DataRequest<Doctor> dataRequestDoctor = doctorFeignClient.getDoctorById(appointment.getDoctorId().toString()).getBody();
-            DataRequest<Patient> dataRequestPatient = patientFeignClient.getPatientById(appointment.getPatientId().toString()).getBody();
-            Appointment appointment1 = new Appointment();
-            appointment1.setDoctor(dataRequestDoctor.getData());
-            appointment1.setPatient(dataRequestPatient.getData());
-            appointment1.setAppointmentTime(appointment.getAppointmentTime());
-            appointment1.setDoctorComments(appointment.getDoctorComments());
-            appointment1.setNotes(appointment.getNotes());
-            appointment1.setStatus(AppointmentStatus.fromValue("PENDING"));
-            return appointmentRepository.save(appointment1).getId();
-        } catch (Exception e){
-            throw new ResourceNotFoundException("Error: " + e.getMessage());
+            // Fetch and validate doctor details
+            Doctor doctor = restTemplate.getForObject(doctorServiceUrl + "/" + appointment.getDoctorId(), Doctor.class);
+            if (doctor == null) {
+                throw new ResourceNotFoundException("Doctor not found with ID: " + appointment.getDoctorId());
+            }
+
+            // Fetch and validate patient details
+            Patient patient = restTemplate.getForObject(patientServiceUrl + "/" + appointment.getPatientId(), Patient.class);
+            if (patient == null) {
+                throw new ResourceNotFoundException("Patient not found with ID: " + appointment.getPatientId());
+            }
+
+            // Create and save the appointment
+            Appointment newAppointment = new Appointment();
+            newAppointment.setDoctor(doctor);
+            newAppointment.setPatient(patient);
+            newAppointment.setAppointmentTime(appointment.getAppointmentTime());
+            newAppointment.setDoctorComments(appointment.getDoctorComments());
+            newAppointment.setNotes(appointment.getNotes());
+            newAppointment.setStatus(AppointmentStatus.PENDING);
+
+            return appointmentRepository.save(newAppointment).getId();
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("Error booking appointment: " + e.getMessage());
         }
     }
 
+    /**
+     * Retrieves appointments by doctor ID, sorted by appointment time.
+     *
+     * @param doctorId the ID of the doctor.
+     * @return a list of appointments for the specified doctor.
+     */
     public List<Appointment> getByDoctorId(String doctorId) {
         return appointmentRepository.findByDoctorId(doctorId, Sort.by(Sort.Direction.ASC, "appointmentTime"));
     }
 
+    /**
+     * Retrieves appointments by patient ID, sorted by appointment time.
+     *
+     * @param patientId the ID of the patient.
+     * @return a list of appointments for the specified patient.
+     */
     public List<Appointment> getByPatientId(String patientId) {
         return appointmentRepository.findByPatientId(patientId, Sort.by(Sort.Direction.ASC, "appointmentTime"));
     }
 
+    /**
+     * Retrieves all appointments, sorted by appointment time in ascending order.
+     *
+     * @return a list of all appointments.
+     */
     public List<Appointment> getAllAppointments() {
         return appointmentRepository.findAllByOrderByAppointmentTimeAsc();
     }
 
-    public String updateAppointment(AppointmentRequest appointment) throws Exception {
+    /**
+     * Updates an existing appointment.
+     *
+     * @param appointment the updated appointment details.
+     * @return the ID of the updated appointment.
+     * @throws ResourceNotFoundException if the appointment is not found.
+     */
+    public String updateAppointment(AppointmentRequest appointment) {
         try {
-            Optional<Appointment> optionalAppointment = appointmentRepository.findById(appointment.getId());
-            if(optionalAppointment.isEmpty()) {
-                throw new ResourceNotFoundException("Appointment not available");
-            } else {
-                DataRequest<Doctor> dataRequestDoctor = doctorFeignClient.getDoctorById(appointment.getDoctorId().toString()).getBody();
-                DataRequest<Patient> dataRequestPatient = patientFeignClient.getPatientById(appointment.getPatientId().toString()).getBody();
-                Appointment updatedAppointment = optionalAppointment.get();
-                updatedAppointment.setDoctor(dataRequestDoctor.getData());
-                updatedAppointment.setPatient(dataRequestPatient.getData());
-                updatedAppointment.setAppointmentTime(appointment.getAppointmentTime());
-                updatedAppointment.setNotes(appointment.getNotes());
-                updatedAppointment.setDoctorComments(appointment.getDoctorComments());
-                updatedAppointment.setStatus(AppointmentStatus.fromValue(appointment.getStatus()));
-                return appointmentRepository.save(updatedAppointment).getId();
+            // Find the existing appointment
+            Appointment existingAppointment = appointmentRepository.findById(appointment.getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointment.getId()));
+
+            // Fetch and validate doctor details
+            Doctor doctor = restTemplate.getForObject(doctorServiceUrl + "/" + appointment.getDoctorId(), Doctor.class);
+            if (doctor == null) {
+                throw new ResourceNotFoundException("Doctor not found with ID: " + appointment.getDoctorId());
             }
+
+            // Fetch and validate patient details
+            Patient patient = restTemplate.getForObject(patientServiceUrl + "/" + appointment.getPatientId(), Patient.class);
+            if (patient == null) {
+                throw new ResourceNotFoundException("Patient not found with ID: " + appointment.getPatientId());
+            }
+
+            // Update appointment details
+            existingAppointment.setDoctor(doctor);
+            existingAppointment.setPatient(patient);
+            existingAppointment.setAppointmentTime(appointment.getAppointmentTime());
+            existingAppointment.setNotes(appointment.getNotes());
+            existingAppointment.setDoctorComments(appointment.getDoctorComments());
+            existingAppointment.setStatus(AppointmentStatus.fromValue(appointment.getStatus()));
+
+            return appointmentRepository.save(existingAppointment).getId();
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            throw new ResourceNotFoundException("Error updating appointment: " + e.getMessage());
         }
     }
 }
