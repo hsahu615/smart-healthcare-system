@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @CrossOrigin(originPatterns = "*")
-@RequestMapping("/api/v1/appointment")
+@RequestMapping("/api/v1/appointments")
 public class AppointmentController {
 
         private static final Logger logger = LoggerFactory.getLogger(AppointmentController.class);
@@ -23,13 +23,13 @@ public class AppointmentController {
         @Autowired
         private AppointmentService appointmentService;
 
-        @PostMapping
+        @PostMapping("/create")
         public ResponseEntity<?> bookAppointment(@Valid @RequestBody AppointmentRequest appointmentRequest) {
             try {
                 String res = appointmentService.bookAppointment(appointmentRequest);
                 return ResponseEntity.status(200).body(new GenericResponse<>("Appointment added successfully", res));
             } catch(Exception e) {
-                logger.error("Error adding appointment: " + e.getMessage());
+                logger.error("Error adding appointment: {}", e.getMessage());
                 return ResponseEntity.status(500).body(new GenericResponse<>("Error adding appointment"));
             }
         }

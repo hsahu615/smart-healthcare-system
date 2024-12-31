@@ -8,6 +8,7 @@ import com.hungrycoders.FeignClient.PatientFeignClient;
 import com.hungrycoders.model.Appointment;
 import com.hungrycoders.exception.ResourceNotFoundException;
 import com.hungrycoders.model.AppointmentStatus;
+import com.hungrycoders.notifications.NotificationProducer;
 import com.hungrycoders.payload.request.AppointmentRequest;
 import com.hungrycoders.payload.request.DataRequest;
 import com.hungrycoders.repository.AppointmentRepo;
@@ -20,6 +21,10 @@ import java.util.UUID;
 
 @Service
 public class AppointmentService {
+
+    @Autowired
+    private NotificationProducer notificationProducer;
+
     @Autowired
     private AppointmentRepo appointmentRepository;
 
@@ -30,19 +35,22 @@ public class AppointmentService {
     private PatientFeignClient patientFeignClient;
 
 
-    public String bookAppointment(AppointmentRequest appointment) {
+    public String bookAppointment(AppointmentRequest appointmentRequest) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            DataRequest<Doctor> dataRequestDoctor = doctorFeignClient.getDoctorById(appointment.getDoctorId().toString()).getBody();
-            DataRequest<Patient> dataRequestPatient = patientFeignClient.getPatientById(appointment.getPatientId().toString()).getBody();
-            Appointment appointment1 = new Appointment();
-            appointment1.setDoctor(dataRequestDoctor.getData());
-            appointment1.setPatient(dataRequestPatient.getData());
-            appointment1.setAppointmentTime(appointment.getAppointmentTime());
-            appointment1.setDoctorComments(appointment.getDoctorComments());
-            appointment1.setNotes(appointment.getNotes());
-            appointment1.setStatus(AppointmentStatus.fromValue("PENDING"));
-            return appointmentRepository.save(appointment1).getId();
+            DataRequest<Doctor> dataRequestDoctor = doctorFeignClient.getDoctorById(appointmentRequest.getDoctorId().toString()).getBody();
+            DataRequest<Patient> dataRequestPatient = patientFeignClient.getPatientById(appointmentRequest.getPatientId().toString()).getBody();
+            Appointment appointment = new Appointment();
+            appointment.setDoctor(dataRequestDoctor.getData());
+            appointment.setPatient(dataRequestPatient.getData());
+            appointment.setAppointmentTime(appointmentRequest.getAppointmentTime());
+            appointment.setDoctorComments(appointmentRequest.getDoctorComments());
+            appointment.setNotes(appointmentRequest.getNotes());
+            appointment.setStatus(AppointmentStatus.PENDING);
+            String appointmentId = appointmentRepository.save(appointment).getId();
+            // send an event to kafka topic here
+            notificationProducer.sendAppointmentEvent(appointment);
+            return appointmentId;
         } catch (Exception e){
             throw new ResourceNotFoundException("Error: " + e.getMessage());
         }
