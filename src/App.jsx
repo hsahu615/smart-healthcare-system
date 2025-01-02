@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import "./App.css";
+import React from "react";
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./pages/Home/Home";
 import AddDoctor from "./pages/AddDoctor/AddDoctor";

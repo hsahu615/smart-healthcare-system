@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
 import { AuthContext } from "../../auth/AuthContext";
-import axiosInstance from "../../services/axiosInstance";
 import { navigateTo } from "../../services/navigateUtil";
 import { spinnerContext } from "../../components/Spinner/spinnerContext";
+import { signIn } from "../../services/service";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -14,15 +14,15 @@ const Login = () => {
     e.preventDefault();
     try {
       setShowSpinner(true);
-      const response = await axiosInstance
-        .post("http://localhost:8081/api/v1/doctor/signin", {
-          username: email,
-          password: password,
-        })
-        .finally(() => {
+      signIn(email, password)
+        .then((response) => {
           setShowSpinner(false);
+          login(response.data.data);
+        })
+        .catch((err) => {
+          setShowSpinner(false);
+          navigateTo("/login");
         });
-      login(response.data.data);
     } catch (error) {
       setShowSpinner(false);
       navigateTo("/login");

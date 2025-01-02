@@ -1,5 +1,4 @@
-// src/utils/axiosInstance.js
-import axios, { AxiosInstance } from "axios";
+import axios from "axios";
 import { navigateTo } from "../services/navigateUtil";
 
 const axiosInstance = axios.create();

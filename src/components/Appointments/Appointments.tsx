@@ -1,12 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
-import "./Appointments.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendar,
   faCancel,
   faCheck,
   faClock,
-  faCross,
   faPencil,
   faStickyNote,
   faTrash,

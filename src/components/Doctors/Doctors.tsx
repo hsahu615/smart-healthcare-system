@@ -7,7 +7,6 @@ import {
   faList,
   faTrash,
   faUser,
-  faUserDoctor,
 } from "@fortawesome/free-solid-svg-icons";
 import Swal from "sweetalert2";
 import {
