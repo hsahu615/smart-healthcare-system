@@ -6,6 +6,7 @@ import com.hungrycoders.model.Patient;
 import com.hungrycoders.model.Appointment;
 import com.hungrycoders.exception.ResourceNotFoundException;
 import com.hungrycoders.model.AppointmentStatus;
+import com.hungrycoders.notifications.NotificationProducer;
 import com.hungrycoders.payload.request.AppointmentRequest;
 import com.hungrycoders.payload.request.DataRequest;
 import com.hungrycoders.repository.AppointmentRepo;
@@ -24,6 +25,9 @@ import java.util.Optional;
  */
 @Service
 public class AppointmentService {
+
+    @Autowired
+    private NotificationProducer notificationProducer;
 
     @Autowired
     private AppointmentRepo appointmentRepository;

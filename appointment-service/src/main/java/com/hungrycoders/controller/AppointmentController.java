@@ -32,7 +32,7 @@ public class AppointmentController {
      * @param appointmentRequest the appointment details.
      * @return a response entity containing the result or an error message.
      */
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<String> bookAppointment(@Valid @RequestBody AppointmentRequest appointmentRequest) {
         logger.info("Booking appointment: {}", appointmentRequest);
         try {
