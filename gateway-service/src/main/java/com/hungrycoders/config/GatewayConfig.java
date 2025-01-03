@@ -26,6 +26,8 @@ public class GatewayConfig {
      */
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
+        System.out.println("inside routes");
+        
         return builder.routes()
                 // Route configuration for doctor-service
                 .route("doctor-service", r -> r.path("/doctors/**")
@@ -51,13 +53,12 @@ public class GatewayConfig {
                                         .setFallbackUri("forward:/fallback/appointment")))
                         .uri("http://appointment-service:8080")) // Correct URI for appointment-service
 
-                // Route configuration for auth-service
-                .route("auth-service", r -> r.path("api/auth/**")
-                        .filters(f -> f
+                .route("auth-service", r -> r.path("/api/auth/**") // Correct matching pattern
+                        .filters(f -> f.filter(filter)
                                 .circuitBreaker(config -> config
                                         .setName("authServiceCircuitBreaker")
                                         .setFallbackUri("forward:/fallback/auth")))
-                        .uri("http://auth-service:8080")) // Correct URI for auth-service
+                        .uri("http://auth-service:8080")) // Correct base URI for auth-service
 
                 .build();
     }

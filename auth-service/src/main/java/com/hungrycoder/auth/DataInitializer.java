@@ -2,60 +2,65 @@ package com.hungrycoder.auth;
 
 import com.hungrycoder.auth.models.Role;
 import com.hungrycoder.auth.models.UserRole;
+import com.hungrycoder.auth.payload.request.SignupRequest;
 import com.hungrycoder.auth.repository.RoleRepository;
+import com.hungrycoder.auth.services.AuthService;
 import org.bson.Document;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class DataInitializer {
+
+    @Autowired
+    private AuthService authService;
 
     @Bean
     public CommandLineRunner initializeData(RoleRepository roleRepository,
                                             MongoTemplate mongoTemplate) {
         return args -> {
 
-            if (roleRepository.findByName(UserRole.ROLE_ADMIN).isEmpty()) {
-                Role adminRole = new Role(UserRole.ROLE_ADMIN);
+            Role adminRole = new Role(UserRole.ROLE_ADMIN);
                 roleRepository.save(adminRole);
                 System.out.println("Created ROLE_ADMIN");
-            }
 
-            if (roleRepository.findByName(UserRole.ROLE_DOCTOR).isEmpty()) {
                 Role doctorRole = new Role(UserRole.ROLE_DOCTOR);
                 roleRepository.save(doctorRole);
                 System.out.println("Created ROLE_DOCTOR");
-            }
 
-            if (roleRepository.findByName(UserRole.ROLE_PATIENT).isEmpty()) {
-                Role patientRole = new Role(UserRole.ROLE_PATIENT);
+
+             Role patientRole = new Role(UserRole.ROLE_PATIENT);
                 roleRepository.save(patientRole);
                 System.out.println("Created ROLE_PATIENT");
-            }
 
-            // Insert into User collection
-            Document adminUser = new Document()
-                    .append("username", "admin")
-                    .append("email", "noreplyhungrycoders@gmail.com")
-                    .append("roles", List.of("ROLE_ADMIN"))
-                    .append("password", "admin123");
+            SignupRequest adminUser = new SignupRequest
+                    ("admin",
+                            "admin@hungrycoders.com",
+                            new HashSet<>(List.of("admin")),
+                            "admin123");
 
-            Document doctorUser = new Document()
-                    .append("username", "doctor")
-                    .append("email", "doctorhungrycoders@gmail.com")
-                    .append("roles", List.of("ROLE_DOCTOR"))
-                    .append("password", "doctor123");
+            SignupRequest doctorUser = new SignupRequest("doctor",
+                    "doctor@hungrycoders.com",
+                    new HashSet<>(List.of("doctor")),
+                    "doctor123");
 
-            Document patientUser = new Document()
-                    .append("username", "patient")
-                    .append("email", "patienthungrycoders@gmail.com")
-                    .append("roles", List.of("ROLE_PATIENT"))
-                    .append("password", "patient123");
+            SignupRequest patientUser = new SignupRequest("patient",
+                    "patient@hungrycoders.com",
+                    new HashSet<>(List.of("patient")),
+                    "patient123");
+
+
+            authService.registerUser(adminUser);
+            authService.registerUser(doctorUser);
+            authService.registerUser(patientUser);
 
             // Insert into Doctors collection
             Document doctor = new Document()
@@ -73,11 +78,6 @@ public class DataInitializer {
                     .append("lastName", "Patient")
                     .append("email", "patienthungrycoders@gmail.com")
                     .append("phone", "123456789");
-
-            // Insert documents into collections
-            mongoTemplate.insert(adminUser, "users");
-            mongoTemplate.insert(doctorUser, "users");
-            mongoTemplate.insert(patientUser, "users");
 
             mongoTemplate.insert(doctor, "doctors");
             mongoTemplate.insert(patient, "patients");

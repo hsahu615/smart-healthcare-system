@@ -22,10 +22,10 @@ public class JwtUtils {
 
   private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class); // Logger for logging errors
 
-  @Value("${jwtSecret}") // Inject the JWT secret from application properties
+  @Value("${jwt.secret}") // Inject the JWT secret from application properties
   private String jwtSecret;
 
-  @Value("${jwtExpirationMs}") // Inject the JWT expiration time from application properties
+  @Value("${jwt.expiration}") // Inject the JWT expiration time from application properties
   private int jwtExpirationMs;
 
   /**

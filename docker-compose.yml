@@ -4,43 +4,51 @@ services:
     mongodb:
         image: mongo:latest
         container_name: mongodb
+        networks:
+            - app-network
         ports:
             - "27017:27017"
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=root
+            - MONGO_INITDB_ROOT_PASSWORD=rootpassword
         volumes:
-            - ./mongo-data:/data/db
+            - mongo-data:/data/db
 
     gateway-service:
         build:
             context: ./gateway-service
         container_name: gateway-service
+        networks:
+            - app-network
         depends_on:
-            - mongodb
+            - auth-service
         ports:
-            - "8080:8080"
+            - "8080:8080" # Only gateway-service is exposed externally
         environment:
             - GATEWAY_SERVICE_PORT=8080
-            - MONGO_URI=mongodb://mongodb:27017/healthcare
+            - JWT_SECRET=aHR0cHM6Ly93d3cueW91YmlsdW1hbWVyaWNhLmNvbS9sb2dpbi8= # Base64-encoded secret
+        restart: always
 
-    appointment-service:
+    auth-service:
         build:
-            context: ./appointment-service
-        container_name: appointment-service
+            context: ./auth-service
+        container_name: auth-service
+        networks:
+            - app-network
         depends_on:
             - mongodb
         ports:
-            - "8082:8082"
+            - "8081:8080"
         environment:
-            - APPOINTMENT_SERVICE_PORT=8082
-            - MONGO_URI=mongodb://mongodb:27017/healthcare
+            - MONGO_URI=mongodb://root:rootpassword@mongodb:27017/healthcare?authSource=admin
+            - JWT_SECRET=aHR0cHM6Ly93d3cueW91YmlsdW1hbWVyaWNhLmNvbS9sb2dpbi8= # Base64-encoded secret
+        restart: always
 
-    doctor-service:
-        build:
-            context: ./doctor-service
-        container_name: doctor-service
-        depends_on:
-            - mongodb
-        ports:
-            - "8081:8081"
-        environment:
-            - DOCTOR_SERVICE_PORT=8081
-            - MONGO_URI=mongodb://mongodb:27017/healthcare?authSource=admin
+networks:
+    app-network:
+
+volumes:
+    mongo-data:
+        driver: local
+
+

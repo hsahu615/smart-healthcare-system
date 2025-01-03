@@ -7,13 +7,10 @@ spring:
 
   logging:
     level:
-      org:
-        springframework:
-          web: DEBUG
-          servlet: DEBUG
+      org.springframework.cloud.gateway: DEBUG
 
 server:
-  port: ${GATEWAY_SERVICE_PORT:8081}
+  port: ${GATEWAY_SERVICE_PORT}
 
-jwtSecret: aHR0cHM6Ly93d3cueW91YmlsdW1hbWVyaWNhLmNvbS9sb2dpbi8=
-jwtExpirationMs: 86400000
+jwt:
+  secret:  ${JWT_SECRET}

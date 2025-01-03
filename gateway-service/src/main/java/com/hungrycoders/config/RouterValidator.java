@@ -13,7 +13,8 @@ public class RouterValidator {
      * A set of endpoints that are publicly accessible and do not require authentication.
      */
     public static final Set<String> openApiEndpoints = Set.of(
-            "/auth/register" // Add more public endpoints as needed
+            "api/auth/register",
+            "api/auth/signin"// Add more public endpoints as needed
     );
 
     /**

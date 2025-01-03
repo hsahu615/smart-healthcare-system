@@ -37,6 +37,7 @@ public class AuthenticationFilter implements GatewayFilter {
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
 
+        System.out.println(request);
         // Check if the request path requires authentication
         if (routerValidator.isSecured.test(request)) {
             if (isAuthMissing(request)) {
@@ -51,6 +52,8 @@ public class AuthenticationFilter implements GatewayFilter {
 
             updateRequest(exchange, token);
         }
+
+        System.out.println("forwarding the request");
         return chain.filter(exchange); // Forward the request if valid
     }
 
