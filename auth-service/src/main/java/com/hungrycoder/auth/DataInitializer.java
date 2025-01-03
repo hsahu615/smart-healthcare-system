@@ -43,17 +43,17 @@ public class DataInitializer {
 
             SignupRequest adminUser = new SignupRequest
                     ("admin",
-                            "admin@hungrycoders.com",
+                            "noreplyhungrycoders@gmail.com",
                             new HashSet<>(List.of("admin")),
                             "admin123");
 
             SignupRequest doctorUser = new SignupRequest("doctor",
-                    "doctor@hungrycoders.com",
+                    "doctorhungrycoders@gmail.com",
                     new HashSet<>(List.of("doctor")),
                     "doctor123");
 
             SignupRequest patientUser = new SignupRequest("patient",
-                    "patient@hungrycoders.com",
+                    "patienthungrycoders@gmail.com",
                     new HashSet<>(List.of("patient")),
                     "patient123");
 
