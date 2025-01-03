@@ -1,4 +1,18 @@
-# Stage 1: Build the custom JRE
+# Stage 1: Build the application JAR
+# Use an official Maven image as the base image
+FROM maven:3.8.8-eclipse-temurin-17 AS build
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the pom.xml and the source code to the container
+COPY pom.xml .
+COPY src ./src
+
+# Build the application using Maven
+RUN mvn clean package -DskipTests
+
+# Stage 2: Build the custom JRE
 FROM amazoncorretto:21-alpine3.18 AS corretto-jdk
 
 # Install necessary tools for `jlink`
@@ -14,14 +28,14 @@ RUN $JAVA_HOME/bin/jlink \
     --compress=2 \
     --output /customjre
 
-# Stage 2: Create the application image
+# Stage 3: Create the application image
 FROM alpine:latest
 
 # Define environment variables for the custom JRE
 ENV JAVA_HOME=/jre
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
-# Copy the custom JRE from the first stage
+# Copy the custom JRE from the second stage
 COPY --from=corretto-jdk /customjre $JAVA_HOME
 
 # Add a non-root user to run the application
@@ -33,8 +47,8 @@ RUN mkdir /app && \
     chown -R $APPLICATION_USER /app
 USER 1000
 
-# Copy the Spring Boot JAR into the image
-COPY --chown=1000:1000 target/gateway-service-0.0.1-SNAPSHOT.jar /app/app.jar
+# Copy the packaged Spring Boot JAR from the build stage
+COPY --from=build /app/target/gateway-service-0.0.1-SNAPSHOT.jar /app/app.jar
 WORKDIR /app
 
 # Expose the application port
