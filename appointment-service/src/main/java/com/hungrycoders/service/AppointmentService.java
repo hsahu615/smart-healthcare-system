@@ -1,5 +1,7 @@
 package com.hungrycoders.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.hungrycoders.exception.ResourceNotFoundException;
 import com.hungrycoders.model.Appointment;
 import com.hungrycoders.model.AppointmentStatus;
@@ -74,8 +76,13 @@ public class AppointmentService {
             newAppointment.setStatus(AppointmentStatus.PENDING);
 
             String appointmentId = appointmentRepository.save(newAppointment).getId();
+
+            // Serialize Appointment object to JSON
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            String appointmentJson = objectMapper.writeValueAsString(newAppointment);
             // send message to kafka
-            kafkaTemplate.send(topicName, newAppointment.toString());
+            kafkaTemplate.send(topicName, appointmentJson);
             return appointmentId;
         } catch (Exception e) {
             throw new ResourceNotFoundException("Error booking appointment: " + e.getMessage());
