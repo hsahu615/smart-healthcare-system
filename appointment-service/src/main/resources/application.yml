@@ -30,10 +30,3 @@ patient:
         mongodb:
             uri: mongodb://root:rootpassword@localhost:27017/healthcare?authSource=admin
 
-    kafka:
-        bootstrap-servers: localhost:9092
-        producer:
-            key-serializer: org.apache.kafka.common.serialization.StringSerializer
-            value-serializer: org.apache.kafka.common.serialization.StringSerializer
-        topic:
-            appointment-notifications: appointment-notifications
