@@ -8,7 +8,7 @@ import Unauthorized from "./pages/Unauthorized";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import { Route, Routes } from "react-router-dom";
 import AuthProvider from "./auth/AuthProvider";
-import SpinnerProvider from "./components/Spinner/spinnerProvider";
+import SpinnerProvider from "./components/Spinner/SpinnerProvider";
 
 function App() {
   return (

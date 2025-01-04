@@ -5,7 +5,7 @@ import { spinnerContext } from "../../components/Spinner/spinnerContext";
 import { signIn } from "../../services/service";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useContext<any>(AuthContext);
   const { setShowSpinner } = useContext(spinnerContext);
@@ -14,7 +14,7 @@ const Login = () => {
     e.preventDefault();
     try {
       setShowSpinner(true);
-      signIn(email, password)
+      signIn(userName, password)
         .then((response) => {
           setShowSpinner(false);
           login(response.data.data);
@@ -42,16 +42,15 @@ const Login = () => {
               <div className="row justify-content-center">
                 <form onSubmit={handleSubmit}>
                   <div className="mb-3">
-                    <label htmlFor="email" className="form-label">
-                      Email address
+                    <label htmlFor="userName" className="form-label">
+                      User Name
                     </label>
                     <input
-                      type="email"
                       className="form-control"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
+                      id="userName"
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      placeholder="Enter your username"
                       required
                     />
                   </div>

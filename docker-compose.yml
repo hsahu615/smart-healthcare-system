@@ -44,6 +44,18 @@ services:
             - JWT_SECRET=aHR0cHM6Ly93d3cueW91YmlsdW1hbWVyaWNhLmNvbS9sb2dpbi8= # Base64-encoded secret
         restart: always
 
+    ui-service:
+        build:
+            context: ./ui-component # Path to your ReactJS project
+        container_name: ui-service
+        networks:
+            - app-network
+        depends_on:
+            - mongodb
+        ports:
+            - "9090:80" # Expose the React app on port 9090
+        restart: always
+
 networks:
     app-network:
 

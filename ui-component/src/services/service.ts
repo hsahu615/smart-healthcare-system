@@ -2,7 +2,7 @@ import axiosInstance from "./axiosInstance";
 
 export const signIn = async (username, password) => {
   const response = await axiosInstance.post(
-    "http://localhost:8081/api/v1/doctor/signin",
+    "http://localhost:8080/api/auth/signin",
     {
       username: username,
       password: password,
