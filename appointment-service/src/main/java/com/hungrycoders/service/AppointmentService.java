@@ -1,23 +1,20 @@
 package com.hungrycoders.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hungrycoders.exception.ResourceNotFoundException;
+import com.hungrycoders.model.Appointment;
+import com.hungrycoders.model.AppointmentStatus;
 import com.hungrycoders.model.Doctor;
 import com.hungrycoders.model.Patient;
-import com.hungrycoders.model.Appointment;
-import com.hungrycoders.exception.ResourceNotFoundException;
-import com.hungrycoders.model.AppointmentStatus;
-import com.hungrycoders.notifications.NotificationProducer;
 import com.hungrycoders.payload.request.AppointmentRequest;
-import com.hungrycoders.payload.request.DataRequest;
 import com.hungrycoders.repository.AppointmentRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Service class to handle appointment-related business logic.
@@ -30,9 +27,6 @@ public class AppointmentService {
     private String environment;
 
     @Autowired
-    private NotificationProducer notificationProducer;
-
-    @Autowired
     private AppointmentRepo appointmentRepository;
 
     @Autowired
@@ -43,6 +37,12 @@ public class AppointmentService {
 
     @Value("${patient.service.url}")
     private String patientServiceUrl;
+
+    @Autowired
+    private KafkaTemplate<String, String> kafkaTemplate;
+
+    @Value("${spring.kafka.producer.topic}")
+    private String topicName;
 
     /**
      * Books a new appointment by validating doctor and patient information.
@@ -73,7 +73,10 @@ public class AppointmentService {
             newAppointment.setNotes(appointment.getNotes());
             newAppointment.setStatus(AppointmentStatus.PENDING);
 
-            return appointmentRepository.save(newAppointment).getId();
+            String appointmentId = appointmentRepository.save(newAppointment).getId();
+            // send message to kafka
+            kafkaTemplate.send(topicName, newAppointment.toString());
+            return appointmentId;
         } catch (Exception e) {
             throw new ResourceNotFoundException("Error booking appointment: " + e.getMessage());
         }
