@@ -1,10 +1,13 @@
+app:
+    environment: dev
+
 spring:
     application:
         name: appointment-service
 
-data:
-    mongodb:
-        uri: mongodb://root:rootpassword@localhost:27017/healthcare?authSource=admin
+    data:
+        mongodb:
+            uri: mongodb://root:rootpassword@localhost:27017/healthcare?authSource=admin
 
 logging:
     level:
