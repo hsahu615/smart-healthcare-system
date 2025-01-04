@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: notification-service
+  kafka:
+    auto-offset-reset: latest
+    bootstrap-servers: localhost:9092
+    group-id: appointment-notifications-group
+    topic:
+      name: appointment-notifications
+server:
+  port: 8083
