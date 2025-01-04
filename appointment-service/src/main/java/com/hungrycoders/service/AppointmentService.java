@@ -26,6 +26,9 @@ import java.util.Optional;
 @Service
 public class AppointmentService {
 
+    @Value("${app.environment}")
+    private String environment;
+
     @Autowired
     private NotificationProducer notificationProducer;
 
@@ -50,13 +53,13 @@ public class AppointmentService {
     public String bookAppointment(AppointmentRequest appointment) {
         try {
             // Fetch and validate doctor details
-            Doctor doctor = restTemplate.getForObject(doctorServiceUrl + "/" + appointment.getDoctorId(), Doctor.class);
+            Doctor doctor = fetchDoctorDetails(appointment.getDoctorId().toString());
             if (doctor == null) {
                 throw new ResourceNotFoundException("Doctor not found with ID: " + appointment.getDoctorId());
             }
 
             // Fetch and validate patient details
-            Patient patient = restTemplate.getForObject(patientServiceUrl + "/" + appointment.getPatientId(), Patient.class);
+            Patient patient = fetchPatientDetails(appointment.getPatientId().toString());
             if (patient == null) {
                 throw new ResourceNotFoundException("Patient not found with ID: " + appointment.getPatientId());
             }
@@ -142,5 +145,53 @@ public class AppointmentService {
         } catch (Exception e) {
             throw new ResourceNotFoundException("Error updating appointment: " + e.getMessage());
         }
+    }
+
+    private Doctor fetchDoctorDetails(String doctorId) {
+        if (isDevelopmentEnvironment()) {
+            // Return a mock Doctor object
+            return new Doctor(
+                    doctorId,
+                    "John",
+                    "Doe",
+                    "john.doe@hospital.com",
+                    "1234567890",
+                    "Cardiology",
+                    10,
+                    "ACTIVE"
+            );
+        }
+
+        // Actual call in non-development environments
+        Doctor doctor = restTemplate.getForObject(doctorServiceUrl + "/" + doctorId, Doctor.class);
+        if (doctor == null) {
+            throw new ResourceNotFoundException("Doctor not found with ID: " + doctorId);
+        }
+        return doctor;
+    }
+
+    private Patient fetchPatientDetails(String patientId) {
+        if (isDevelopmentEnvironment()) {
+            // Return a mock Patient object
+            return new Patient(
+                    patientId,
+                    "Jane",
+                    "Smith",
+                    "jane.smith@example.com",
+                    "0987654321",
+                    30
+            );
+        }
+
+        // Actual call in non-development environments
+        Patient patient = restTemplate.getForObject(patientServiceUrl + "/" + patientId, Patient.class);
+        if (patient == null) {
+            throw new ResourceNotFoundException("Patient not found with ID: " + patientId);
+        }
+        return patient;
+    }
+
+    private boolean isDevelopmentEnvironment() {
+        return "dev".equalsIgnoreCase(environment);
     }
 }
