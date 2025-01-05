@@ -9,6 +9,11 @@ spring:
         mongodb:
             uri: mongodb://root:rootpassword@localhost:27017/healthcare?authSource=admin
 
+    kafka:
+        bootstrap-servers: localhost:9092
+        producer:
+            topic: appointment-notifications
+
 logging:
     level:
         org:
