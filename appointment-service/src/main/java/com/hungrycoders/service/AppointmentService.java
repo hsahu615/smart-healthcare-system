@@ -164,7 +164,7 @@ public class AppointmentService {
                     doctorId,
                     "John",
                     "Doe",
-                    "john.doe@hospital.com",
+                    "doctorhungrycoders@gmail.com",
                     "1234567890",
                     "Cardiology",
                     10,

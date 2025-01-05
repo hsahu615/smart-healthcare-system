@@ -7,5 +7,16 @@ spring:
     group-id: appointment-notifications-group
     topic:
       name: appointment-notifications
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: noreplyhungrycoders@gmail.com
+    password: aorykxbxzjlrdpot
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 server:
   port: 8083
