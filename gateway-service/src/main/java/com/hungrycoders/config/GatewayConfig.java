@@ -5,6 +5,8 @@ import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 
 @Configuration // Marks this class as a configuration class for Spring
 public class GatewayConfig {
@@ -27,7 +29,7 @@ public class GatewayConfig {
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
         System.out.println("inside routes");
-        
+
         return builder.routes()
                 // Route configuration for doctor-service
                 .route("doctor-service", r -> r.path("/doctors/**")
@@ -53,12 +55,20 @@ public class GatewayConfig {
                                         .setFallbackUri("forward:/fallback/appointment")))
                         .uri("http://appointment-service:8080")) // Correct URI for appointment-service
 
-                .route("auth-service", r -> r.path("/api/auth/**") // Correct matching pattern
-                        .filters(f -> f.filter(filter)
-                                .circuitBreaker(config -> config
-                                        .setName("authServiceCircuitBreaker")
-                                        .setFallbackUri("forward:/fallback/auth")))
-                        .uri("http://auth-service:8080")) // Correct base URI for auth-service
+                .route("auth-service", r -> r.path("/api/auth/**")
+                .filters(f -> f
+                        .circuitBreaker(c -> c.setName("authCircuitBreaker").setFallbackUri("forward:/fallback/auth"))
+                        .filter(new RemoveDuplicateHeadersFilter()) // Optional: Remove duplicate headers
+                        .filter((exchange, chain) -> {
+                            // Handle preflight OPTIONS requests
+                            if (exchange.getRequest().getMethod() == HttpMethod.OPTIONS) {
+                                exchange.getResponse().setStatusCode(HttpStatus.OK);
+                                return exchange.getResponse().setComplete();
+                            }
+                            return chain.filter(exchange);
+                        })
+                )
+                .uri("http://auth-service:8080")) // Correct base URI for auth-service
 
                 .build();
     }
