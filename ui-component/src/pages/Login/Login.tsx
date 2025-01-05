@@ -17,7 +17,7 @@ const Login = () => {
       signIn(userName, password)
         .then((response) => {
           setShowSpinner(false);
-          login(response.data.data);
+          login(response.data);
         })
         .catch((err) => {
           setShowSpinner(false);
