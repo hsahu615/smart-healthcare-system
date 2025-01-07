@@ -17,17 +17,24 @@ import {
 import { formatDate, isPast } from "../../services/util.service";
 import { spinnerContext } from "../Spinner/spinnerContext";
 
+// Doctors Component: Displays a list of doctors, allows viewing their appointments, and deleting doctors.
 const Doctors = () => {
+  // State to store the list of doctors
   const [doctors, setDoctors] = useState([]);
+  // State to store the appointments of a selected doctor
   const [appointments, setAppointments] = useState([]);
+  // State to control the visibility of the popup
   const [showModal, setShowModal] = useState(false);
+  // Access the spinner context to show/hide loading indicators
   const { setShowSpinner } = useContext(spinnerContext);
 
+  // useEffect to fetch the list of doctors when the component loads
   useEffect(() => {
     setShowSpinner(true);
     getAllDoctors()
       .then((res: any) => {
         setShowSpinner(false);
+        // Set the doctors list or an empty array if no data is returned
         const aps = res?.data?.data === undefined ? [] : res?.data?.data;
         setDoctors(aps);
       })
@@ -37,6 +44,7 @@ const Doctors = () => {
       });
   }, []);
 
+  // Fetch appointments for a specific doctor
   const handleShow = (doctorId) => {
     setShowSpinner(true);
     getAllAppointmentsByDoctor(doctorId)
@@ -51,8 +59,11 @@ const Doctors = () => {
       });
     setShowModal(true);
   };
+
+  // Close the appointments popup
   const handleClose = () => setShowModal(false);
 
+  // Delete a doctor and refresh the doctors list
   const handleDelete = (id) => {
     Swal.fire({
       title: "Confirm",
@@ -87,6 +98,7 @@ const Doctors = () => {
 
   return (
     <div>
+      {/* List of doctors */}
       {doctors.map((doctor: any) => (
         <div
           className="card my-2 w-100"
@@ -139,6 +151,7 @@ const Doctors = () => {
               </div>
             </div>
           </div>
+          {/* Popup for appointments of a doctor */}
           {showModal && (
             <div
               className="modal show d-block"

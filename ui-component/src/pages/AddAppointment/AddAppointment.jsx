@@ -7,9 +7,11 @@ import { spinnerContext } from "../../components/Spinner/spinnerContext";
 
 const AddAppointment = () => {
   const { setShowSpinner } = useContext(spinnerContext);
-  const [doctors, setDoctors] = useState([]);
-  const [currentTime, setCurrentTime] = useState(Date.now());
-  const { user } = useContext(AuthContext);
+  const [doctors, setDoctors] = useState([]); // State to store available doctors
+  const [currentTime, setCurrentTime] = useState(Date.now()); // Current timestamp for appointment validation
+  const { user } = useContext(AuthContext); // Accessing user context for patient info
+
+  // Initial appointment state to store form data
   const initialAppointment = {
     doctorId: "",
     patientId: user?.id,
@@ -18,27 +20,35 @@ const AddAppointment = () => {
     notes: "",
     doctorComments: "",
   };
-  const [appointment, setAppointment] = useState(initialAppointment);
+  const [appointment, setAppointment] = useState(initialAppointment); // State to store appointment details
 
   useEffect(() => {
-    setCurrentTime(getCurrentTime());
+    setCurrentTime(getCurrentTime()); // Set the current time for appointment validation
     setShowSpinner(true);
+
+    // Fetch available doctors from the backend
     getAllDoctors()
       .then((res) => {
         setShowSpinner(false);
         const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+        // Filter the doctors who are available
         setDoctors(aps.filter((doctor) => doctor.status === "AVAILABLE"));
+
+        // Set the first available doctor as default in the form
         if (aps?.length > 0) initialAppointment.doctorId = aps[0].id;
         setAppointment(initialAppointment);
+        // Update the state with initial appointment
       })
       .catch((e) => {
         setShowSpinner(false);
       });
   }, []);
 
+  // Handle form submission to add appointment
   const handleSubmit = (e) => {
     e.preventDefault();
     if (doctors.length === 0) {
+      // If no doctors are available, show an alert
       Swal.fire({
         title: "Sorry, No Doctors available",
         timer: 2000,
@@ -46,20 +56,24 @@ const AddAppointment = () => {
       });
       return;
     }
+
+    // Prepare the appointment data to be submitted
     const appointmentTemp = appointment;
     appointmentTemp.patientId = user?.id;
     setShowSpinner(true);
+    // Make API call to add the appointment
     addAppointment(appointmentTemp)
       .then((res) => {
         setShowSpinner(false);
         if (res.status === 200) {
+          // Show success alert if appointment is added successfully
           Swal.fire({
             title: "Success",
             text: "Appointment added",
             icon: "info",
           });
         }
-        handleReset();
+        handleReset(); // Reset form fields after submission
       })
       .catch((e) => {
         setShowSpinner(false);
@@ -71,12 +85,15 @@ const AddAppointment = () => {
       });
   };
 
+  // Reset the appointment form fields to initial state
   const handleReset = () => {
     setAppointment(initialAppointment);
   };
 
+  // Handle changes in form input fields
   const handleChange = (event) => {
     const { id, value, type, checked } = event.target;
+    // Update only the changed field in the appointment state
     setAppointment((prevData) => ({
       ...prevData,
       [id]: type === "checkbox" ? checked : value, // Update only the changed field
@@ -99,6 +116,7 @@ const AddAppointment = () => {
               disabled={doctors.length === 0}
             >
               {doctors.length > 0 &&
+                // If doctors are available, map them to dropdown options
                 doctors.map(
                   (doctor) =>
                     doctor.status.toLowerCase() === "available" && (
@@ -107,7 +125,7 @@ const AddAppointment = () => {
                       </option>
                     )
                 )}
-
+              {/* // If no doctors are available, show a placeholder */}
               {doctors.length === 0 && (
                 <option unselectable="on">Sorry, No Doctors available</option>
               )}
