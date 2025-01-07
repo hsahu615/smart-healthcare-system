@@ -29,6 +29,7 @@ const Appointments = () => {
   const [updateModal, setUpdateModal] = useState(false);
   const [currentRole, setCurrentRole] = useState<any>("");
   const { setShowSpinner } = useContext(spinnerContext);
+  const user: any = localStorage.getItem("user");
 
   // Fetch appointments data on component mount
   useEffect(() => {
@@ -42,29 +43,35 @@ const Appointments = () => {
     setShowSpinner(true);
 
     // Fetch appointments for patients
-    if (role === "ROLE_PATIENT")
-      getAllAppointmentsByPatient("75265e11-337a-4054-a1d1-7b416d5ddec6")
-        .then((res: any) => {
-          setShowSpinner(false);
-          const aps = res?.data?.data === undefined ? [] : res?.data?.data;
-          setAppointments(aps);
-        })
-        .catch((err) => {
-          setShowSpinner(false);
-          console.log(err);
-        });
+    if (role === "ROLE_PATIENT") {
+      if (user && user.id) {
+        getAllAppointmentsByPatient(user.id)
+          .then((res: any) => {
+            setShowSpinner(false);
+            const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+            setAppointments(aps);
+          })
+          .catch((err) => {
+            setShowSpinner(false);
+            console.log(err);
+          });
+      }
+    }
     // Fetch appointments for doctors
-    else if (role === "ROLE_DOCTOR")
-      getAllAppointmentsByDoctor("7f57e292-7eb1-4fdc-9c3c-359eb7fbcea3")
-        .then((res: any) => {
-          setShowSpinner(false);
-          const aps = res?.data?.data === undefined ? [] : res?.data?.data;
-          setAppointments(aps);
-        })
-        .catch((err) => {
-          setShowSpinner(false);
-          console.log(err);
-        });
+    else if (role === "ROLE_DOCTOR") {
+      if (user && user.id) {
+        getAllAppointmentsByDoctor(user.id)
+          .then((res: any) => {
+            setShowSpinner(false);
+            const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+            setAppointments(aps);
+          })
+          .catch((err) => {
+            setShowSpinner(false);
+            console.log(err);
+          });
+      }
+    }
     // Fetch all appointments for admins
     else
       getAllAppointments()
