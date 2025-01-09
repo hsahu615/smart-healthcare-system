@@ -1,10 +1,10 @@
 # Stage 1: Build the custom JRE
 FROM amazoncorretto:21-alpine3.18 AS corretto-jdk
 
-# Install the necessary tools for using `jlink`
+# Install necessary tools for `jlink`
 RUN apk add --no-cache binutils
 
-# Use `jlink` to create a lightweight custom JRE with only the required modules
+# Use `jlink` to create a lightweight custom JRE
 RUN $JAVA_HOME/bin/jlink \
     --verbose \
     --add-modules ALL-MODULE-PATH \
@@ -14,31 +14,31 @@ RUN $JAVA_HOME/bin/jlink \
     --compress=2 \
     --output /customjre
 
-# Stage 2: Create the final application image
+# Stage 2: Create the application image
 FROM alpine:latest
 
-# Set environment variables for the custom JRE
+# Define environment variables for the custom JRE
 ENV JAVA_HOME=/jre
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
-# Copy the custom JRE built in the first stage into the application image
+# Copy the custom JRE from the first stage
 COPY --from=corretto-jdk /customjre $JAVA_HOME
 
-# Add a non-root user to enhance security
+# Add a non-root user to run the application
 ARG APPLICATION_USER=appuser
 RUN adduser --no-create-home -u 1000 -D $APPLICATION_USER
 
-# Create the application directory and set ownership to the non-root user
+# Configure the working directory and set permissions
 RUN mkdir /app && \
     chown -R $APPLICATION_USER /app
 USER 1000
 
-# Copy the Spring Boot JAR into the application directory
-COPY target/auth-service-0.0.1-SNAPSHOT.jar /app/app.jar
+# Copy the Spring Boot JAR into the image
+COPY --chown=1000:1000 target/patient-service-0.0.1-SNAPSHOT.jar /app/app.jar
 WORKDIR /app
 
-# Expose the port on which the application will run
+# Expose the application port
 EXPOSE 8080
 
-# Specify the entry point to run the Spring Boot application with the custom JRE
+# Define the entry point
 ENTRYPOINT [ "/jre/bin/java", "-Dspring.profiles.active=prod", "-jar", "/app/app.jar" ]

@@ -20,8 +20,6 @@ services:
         container_name: gateway-service
         networks:
             - app-network
-        depends_on:
-            - auth-service
         ports:
             - "8080:8080" # Only gateway-service is exposed externally
         environment:
@@ -37,11 +35,80 @@ services:
             - app-network
         depends_on:
             - mongodb
-        ports:
-            - "8081:8080"
+#        ports:
+#            - "8081:8080"
         environment:
             - MONGO_URI=mongodb://root:rootpassword@mongodb:27017/healthcare?authSource=admin
             - JWT_SECRET=aHR0cHM6Ly93d3cueW91YmlsdW1hbWVyaWNhLmNvbS9sb2dpbi8= # Base64-encoded secret
+        restart: always
+
+    doctor-service:
+        build:
+            context:  ./doctor-service
+        container_name: doctor-service
+        networks:
+            - app-network
+        depends_on:
+            - mongodb
+            - gateway-service
+#        ports:
+#            - "8082:8080"
+        environment:
+            - MONGO_URI=mongodb://root:rootpassword@mongodb:27017/healthcare?authSource=admin
+        restart: always
+
+    patient-service:
+        build:
+            context: ./patient-service
+        container_name: patient-service
+        networks:
+            - app-network
+        depends_on:
+            - mongodb
+            - gateway-service
+#        ports:
+#            - "8083:8080"
+        environment:
+            - MONGO_URI=mongodb://root:rootpassword@mongodb:27017/healthcare?authSource=admin
+        restart: always
+
+    appointment-service:
+        build:
+            context: ./appointment-service
+        container_name: appointment-service
+        networks:
+            - app-network
+        depends_on:
+            - mongodb
+            - gateway-service
+            - doctor-service
+            - patient-service
+            - # kafka
+#        ports:
+#            - "8084:8080"
+        environment:
+            - MONGO_URI=mongodb://root:rootpassword@mongodb:27017/healthcare?authSource=admin
+            - # kafka bootstrap server, topic name
+        restart: always
+
+    notification-service:
+        build:
+            context: ./notification-service
+        container_name: notification-service
+        networks:
+            - app-network
+        depends_on:
+            - mongodb
+            - gateway-service
+            - doctor-service
+            - patient-service
+            - appointment-service
+            - # kafka
+              #        ports:
+            #            - "8084:8080"
+        environment:
+            - MONGO_URI=mongodb://root:rootpassword@mongodb:27017/healthcare?authSource=admin
+            - # kafka bootstrap server, topic name
         restart: always
 
     ui-service:

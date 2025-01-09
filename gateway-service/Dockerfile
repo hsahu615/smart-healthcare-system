@@ -1,20 +1,6 @@
-# Stage 1: Build the application JAR
-# Use an official Maven image as the base image
-FROM maven:3.8.8-eclipse-temurin-17 AS build
-
-# Set the working directory in the container
-WORKDIR /app
-
-# Copy the pom.xml and the source code to the container
-COPY pom.xml .
-COPY src ./src
-
-# Build the application using Maven
-RUN mvn clean package -DskipTests
-
-# Stage 2: Build the custom JRE
+# Stage 1: Use an official Maven image as the base image
 FROM amazoncorretto:21-alpine3.18 AS corretto-jdk
-
+# Stage 2: Build the custom JRE
 # Install necessary tools for `jlink`
 RUN apk add --no-cache binutils
 

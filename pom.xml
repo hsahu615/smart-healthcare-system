@@ -27,6 +27,7 @@
 		<module>gateway-service</module>
 		<module>notification-service</module>
         <module>patient-service</module>
+		<module>auth-service</module>
     </modules>
     <scm>
 		<connection/>
