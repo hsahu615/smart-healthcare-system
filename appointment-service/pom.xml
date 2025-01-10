@@ -10,7 +10,7 @@
 
     <artifactId>appointment-service</artifactId>
     <packaging>jar</packaging>
-
+    <version>0.0.1-SNAPSHOT</version>
     <name>appointment-service</name>
     <url>http://maven.apache.org</url>
 
@@ -67,6 +67,14 @@
         </dependency>
 
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
     <dependencyManagement>
         <dependencies>
             <!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-dependencies -->

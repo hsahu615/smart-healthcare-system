@@ -34,7 +34,7 @@ RUN mkdir /app && \
 USER 1000
 
 # Copy the packaged Spring Boot JAR from the build stage
-COPY --from=build /app/target/gateway-service-0.0.1-SNAPSHOT.jar /app/app.jar
+COPY --chown=1000:1000 target/gateway-service-0.0.1-SNAPSHOT.jar /app/app.jar
 WORKDIR /app
 
 # Expose the application port

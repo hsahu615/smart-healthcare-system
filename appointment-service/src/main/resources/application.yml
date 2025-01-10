@@ -1,5 +1,5 @@
 app:
-    environment: dev
+    environment: prod
 
 spring:
     application:
