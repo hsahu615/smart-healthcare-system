@@ -1,6 +1,6 @@
 // Production constants
 export const SIGNIN_PROD = "http://localhost:8080/api/auth/signin";
-export const ADD_APPOINTMENT_PROD = "http://localhost:8080/api/v1/appointments";
+export const ADD_APPOINTMENT_PROD = "http://localhost:8080/api/v1/appointments/create";
 export const ADD_DOCTOR_PROD = "http://localhost:8080/api/v1/doctor";
 export const GET_ALL_DOCTORS_PROD = "http://localhost:8080/api/v1/doctor/all";
 export const GET_ALL_PATIENTS_PROD = "http://localhost:8080/api/v1/patient/all";
@@ -18,7 +18,7 @@ export const UPDATE_DOCTOR_PROD = "http://localhost:8080/api/v1/doctor";
 
 // Development constants
 export const SIGNIN_DEV = "http://localhost:8080/api/auth/signin";
-export const ADD_APPOINTMENT_DEV = "http://localhost:8080/api/v1/appointments";
+export const ADD_APPOINTMENT_DEV = "http://localhost:8080/api/v1/appointments/create";
 export const ADD_DOCTOR_DEV = "http://localhost:8081/api/v1/doctor/";
 export const GET_ALL_DOCTORS_DEV = "http://localhost:8081/api/v1/doctor/all";
 export const GET_ALL_PATIENTS_DEV = "http://localhost:8082/api/v1/patient/all";

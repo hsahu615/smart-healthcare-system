@@ -56,15 +56,9 @@ public class AppointmentService {
         try {
             // Fetch and validate doctor details
             Doctor doctor = fetchDoctorDetails(appointment.getDoctorId().toString());
-            if (doctor == null) {
-                throw new ResourceNotFoundException("Doctor not found with ID: " + appointment.getDoctorId());
-            }
 
             // Fetch and validate patient details
             Patient patient = fetchPatientDetails(appointment.getPatientId().toString());
-            if (patient == null) {
-                throw new ResourceNotFoundException("Patient not found with ID: " + appointment.getPatientId());
-            }
 
             // Create and save the appointment
             Appointment newAppointment = new Appointment();

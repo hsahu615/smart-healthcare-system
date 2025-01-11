@@ -20,6 +20,10 @@ logging:
             springframework:
                 web: DEBUG
                 servlet: DEBUG
+            apache:
+                kafka:
+                    clients:
+                        producer: DEBUG
 
 server:
     port: ${APPOINTMENT_SERVICE_PORT:8080}

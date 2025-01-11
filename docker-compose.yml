@@ -12,7 +12,7 @@ services:
             - MONGO_INITDB_ROOT_USERNAME=root
             - MONGO_INITDB_ROOT_PASSWORD=rootpassword
         volumes:
-            - mongo-data:/data/db
+            - ./mongo-data:/data/db
 
     gateway-service:
         build:
