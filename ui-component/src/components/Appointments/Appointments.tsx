@@ -20,44 +20,59 @@ import {
 import Swal from "sweetalert2";
 import { spinnerContext } from "../Spinner/spinnerContext";
 
+// Appointments Component: Handles fetching, displaying, and managing appointments
 const Appointments = () => {
+  // State hooks for managing appointments, doctor details, modals, and user role
   const [appointments, setAppointments] = useState<any>([]);
   const [doctor, setDoctor] = useState<any>({});
   const [showModal, setShowModal] = useState(false);
   const [updateModal, setUpdateModal] = useState(false);
   const [currentRole, setCurrentRole] = useState<any>("");
   const { setShowSpinner } = useContext(spinnerContext);
+  const user: any = localStorage.getItem("user");
 
+  // Fetch appointments data on component mount
   useEffect(() => {
     fetchData();
   }, []);
 
+  // Fetch data based on user role (Patient, Doctor, or Admin)
   const fetchData = () => {
     const role = localStorage.getItem("userRole");
     setCurrentRole(role);
     setShowSpinner(true);
-    if (role === "ROLE_PATIENT")
-      getAllAppointmentsByPatient("75265e11-337a-4054-a1d1-7b416d5ddec6")
-        .then((res: any) => {
-          setShowSpinner(false);
-          const aps = res?.data?.data === undefined ? [] : res?.data?.data;
-          setAppointments(aps);
-        })
-        .catch((err) => {
-          setShowSpinner(false);
-          console.log(err);
-        });
-    else if (role === "ROLE_DOCTOR")
-      getAllAppointmentsByDoctor("7f57e292-7eb1-4fdc-9c3c-359eb7fbcea3")
-        .then((res: any) => {
-          setShowSpinner(false);
-          const aps = res?.data?.data === undefined ? [] : res?.data?.data;
-          setAppointments(aps);
-        })
-        .catch((err) => {
-          setShowSpinner(false);
-          console.log(err);
-        });
+
+    // Fetch appointments for patients
+    if (role === "ROLE_PATIENT") {
+      if (user && user.id) {
+        getAllAppointmentsByPatient(user.id)
+          .then((res: any) => {
+            setShowSpinner(false);
+            const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+            setAppointments(aps);
+          })
+          .catch((err) => {
+            setShowSpinner(false);
+            console.log(err);
+          });
+      }
+    }
+    // Fetch appointments for doctors
+    else if (role === "ROLE_DOCTOR") {
+      if (user && user.id) {
+        getAllAppointmentsByDoctor(user.id)
+          .then((res: any) => {
+            setShowSpinner(false);
+            const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+            setAppointments(aps);
+          })
+          .catch((err) => {
+            setShowSpinner(false);
+            console.log(err);
+          });
+      }
+    }
+    // Fetch all appointments for admins
     else
       getAllAppointments()
         .then((res: any) => {
@@ -71,17 +86,24 @@ const Appointments = () => {
         });
   };
 
+  // Show doctor details popup
   const handleShow = (doctor: any) => {
     setDoctor(doctor);
     setShowModal(true);
   };
+
+  // Close doctor details popup
   const handleClose = () => setShowModal(false);
 
-  const updateModalShow = (appointment: any) => {
+  // Show appointment update popup
+  const updateModalShow = () => {
     setUpdateModal(true);
   };
+
+  // Close appointment update popup
   const updateClose = () => setUpdateModal(false);
 
+  // Format date to DD MMM YYYY format
   const formatDate = (date) => {
     const dat = new Date(date);
     return new Intl.DateTimeFormat("en-GB", {
@@ -91,12 +113,14 @@ const Appointments = () => {
     }).format(dat);
   };
 
+  // Check if the appointment is in the past
   const isPast = (time) => {
     const appointmentTime = new Date(time);
     const currentTime = new Date();
     return currentTime > appointmentTime;
   };
 
+  // Update appointment status (e.g., Confirmed, Rejected)
   const updateAppointmentStatus = (appointment, status) => {
     appointment.status = status;
     setShowSpinner(true);
@@ -117,6 +141,7 @@ const Appointments = () => {
       });
   };
 
+  // Update appointment details after checkup
   const updateAfterCheckup = (appointment, e) => {
     e.preventDefault();
     appointment.doctorComments = e.target[3].value;
@@ -140,6 +165,7 @@ const Appointments = () => {
       });
   };
 
+  // Reject an appointment
   const deleteAppointment = (appointment) => {
     appointment.status = "REJECTED";
     setShowSpinner(true);
@@ -163,6 +189,7 @@ const Appointments = () => {
 
   return (
     <div>
+      {/* Map through appointments and render each appointment card */}
       {appointments.map((appointment: any) => (
         <div
           className="card my-2 w-100"
@@ -370,7 +397,7 @@ const Appointments = () => {
                       <FontAwesomeIcon
                         icon={faPencil}
                         className="mx-1"
-                        onClick={() => updateModalShow(appointment)}
+                        onClick={() => updateModalShow()}
                       />
                     </button>
                   )}

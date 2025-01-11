@@ -5,15 +5,22 @@ import { spinnerContext } from "../../components/Spinner/spinnerContext";
 import { signIn } from "../../services/service";
 
 const Login = () => {
+  // State variables to manage the user input for username and password
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
+
+  // Accessing login function from AuthContext
   const { login } = useContext<any>(AuthContext);
+
+  // Accessing setShowSpinner to control the spinner visibility during login
   const { setShowSpinner } = useContext(spinnerContext);
 
+  // Handle form submission when user tries to log in
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
       setShowSpinner(true);
+      // Attempt to sign in with the provided username and password
       signIn(userName, password)
         .then((response) => {
           setShowSpinner(false);
@@ -31,6 +38,7 @@ const Login = () => {
 
   return (
     <div>
+      {/* Modal styling to create a login popup */}
       <div
         className="modal show d-block"
         style={{ backgroundColor: "rgba(18, 19, 19, 0.85)" }}

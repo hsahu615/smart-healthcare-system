@@ -5,7 +5,6 @@ import {
   faCalendar,
   faClock,
   faList,
-  faTrash,
   faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -15,31 +14,39 @@ import {
 import { spinnerContext } from "../Spinner/spinnerContext";
 import { formatDate, isPast } from "../../services/util.service";
 
+// Patients Component: Displays a list of patients and their appointments.
 const Patients = () => {
+  // State variables to hold patients list, appointments, and popup visibility
   const [patients, setPatients] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [appointments, setAppointments] = useState([]);
+
+  // Accessing the spinner context to show and hide loading spinner
   const { setShowSpinner } = useContext(spinnerContext);
 
+  // Fetching all patients when the component mounts
   useEffect(() => {
-    setShowSpinner(true);
+    setShowSpinner(true); // Show the spinner while fetching data
     getAllPatients()
       .then((res: any) => {
-        setShowSpinner(false);
+        setShowSpinner(false); // Hide the spinner once data is received
+        // Extract patient data or set an empty array if no data
         const aps = res?.data?.data === undefined ? [] : res?.data?.data;
-        setPatients(aps);
+        setPatients(aps); // Set the patients state with the data
       })
       .catch((err) => {
-        setShowSpinner(false);
+        setShowSpinner(false); // Hide the spinner in case of an error
         console.log(err);
       });
   }, []);
 
+  // Function to show the appointments for a specific patient
   const handleShow = (patientId) => {
-    setShowSpinner(true);
+    setShowSpinner(true); // Show the spinner during data fetching
     getAllAppointmentsByPatient(patientId)
       .then((res: any) => {
-        setShowSpinner(false);
+        setShowSpinner(false); // Hide the spinner once data is received
+        // Extract appointment data or set an empty array if no data
         const aps = res?.data?.data === undefined ? [] : res?.data?.data;
         setAppointments(aps);
       })
@@ -47,12 +54,15 @@ const Patients = () => {
         setShowSpinner(false);
         console.log(err);
       });
-    setShowModal(true);
+    setShowModal(true); // Show the popup containing the patient's appointments
   };
+
+  // Function to close the popup
   const handleClose = () => setShowModal(false);
 
   return (
     <div>
+      {/* Map through the list of patients to display each one */}
       {patients.map((patient: any) => (
         <div
           className="card my-2 w-100"
@@ -85,6 +95,7 @@ const Patients = () => {
               </div>
             </div>
           </div>
+          {/* Popup to display appointments, conditionally rendered */}
           {showModal && (
             <div
               className="modal show d-block"

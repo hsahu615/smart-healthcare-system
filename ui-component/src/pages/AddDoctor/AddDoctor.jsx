@@ -4,6 +4,7 @@ import { addDoctor } from "../../services/service";
 import { spinnerContext } from "../../components/Spinner/spinnerContext";
 
 const AddDoctor = () => {
+  // Initial state structure for doctor form
   const initialDoctor = {
     firstName: "",
     lastName: "",
@@ -11,29 +12,35 @@ const AddDoctor = () => {
     phone: "",
     speciality: "",
     yearsOfExperience: 0,
-    status: "AVAILABLE",
+    status: "AVAILABLE", // Default status when adding a doctor
   };
-  const [doctor, setDoctor] = useState(initialDoctor);
+  const [doctor, setDoctor] = useState(initialDoctor); // State to track doctor form data
   const { setShowSpinner } = useContext(spinnerContext);
 
+  // Handle form submission
   const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(doctor);
+    e.preventDefault(); // Prevent page refresh on form submit
+    console.log(doctor); // Logging the doctor data for debug purposes
+
     setShowSpinner(true);
+
+    // Make API call to add doctor
     addDoctor(doctor)
       .then((res) => {
-        setShowSpinner(false);
+        setShowSpinner(false); // Hide spinner after the API response
         if (res.status === 200) {
+          // Show success message if doctor is successfully added
           Swal.fire({
             title: "Success",
             text: "Doctor added",
             icon: "info",
           });
         }
-        handleReset();
+        handleReset(); // Reset form after successful submission
       })
       .catch(() => {
-        setShowSpinner(false);
+        setShowSpinner(false); // Hide spinner in case of error
+        // Show error message if adding doctor fails
         Swal.fire({
           title: "Failed",
           text: "Error encountered",
@@ -42,15 +49,18 @@ const AddDoctor = () => {
       });
   };
 
+  // Reset form to initial state
   const handleReset = () => {
     setDoctor(initialDoctor);
   };
 
+  // Handle changes in form input fields
   const handleChange = (event) => {
     const { id, value, type, checked } = event.target;
+    // Update only the changed field in the doctor state
     setDoctor((prevData) => ({
       ...prevData,
-      [id]: type === "checkbox" ? checked : value, // Update only the changed field
+      [id]: type === "checkbox" ? checked : value,
     }));
   };
   return (
