@@ -33,42 +33,67 @@ public class GatewayConfig {
         return builder.routes()
                 // Route configuration for doctor-service
                 .route("doctor-service", r -> r.path("/doctors/**")
-                        .filters(f -> f.filter(filter)
-                                .circuitBreaker(config -> config
-                                        .setName("doctorCircuitBreaker")
-                                        .setFallbackUri("forward:/fallback/doctor")))
-                        .uri("http://doctor-service:8080")) // Correct URI for doctor-service
+                        .filters(f -> f
+                                .circuitBreaker(c -> c.setName("doctorCircuitBreaker").setFallbackUri("forward:/fallback/doctor"))
+                                .filter(new RemoveDuplicateHeadersFilter()) // Optional: Remove duplicate headers
+                                .filter((exchange, chain) -> {
+                                    // Handle preflight OPTIONS requests
+                                    if (exchange.getRequest().getMethod() == HttpMethod.OPTIONS) {
+                                        exchange.getResponse().setStatusCode(HttpStatus.OK);
+                                        return exchange.getResponse().setComplete();
+                                    }
+                                    return chain.filter(exchange);
+                                })
+                        )
+                        .uri("http://doctor-service:8080")) // Correct base URI for doctor-service
 
                 // Route configuration for patient-service
                 .route("patient-service", r -> r.path("/patients/**")
-                        .filters(f -> f.filter(filter)
-                                .circuitBreaker(config -> config
-                                        .setName("patientCircuitBreaker")
-                                        .setFallbackUri("forward:/fallback/patient")))
-                        .uri("http://patient-service:8080")) // Correct URI for patient-service
+                        .filters(f -> f
+                                .circuitBreaker(c -> c.setName("patientCircuitBreaker").setFallbackUri("forward:/fallback/patient"))
+                                .filter(new RemoveDuplicateHeadersFilter()) // Optional: Remove duplicate headers
+                                .filter((exchange, chain) -> {
+                                    // Handle preflight OPTIONS requests
+                                    if (exchange.getRequest().getMethod() == HttpMethod.OPTIONS) {
+                                        exchange.getResponse().setStatusCode(HttpStatus.OK);
+                                        return exchange.getResponse().setComplete();
+                                    }
+                                    return chain.filter(exchange);
+                                })
+                        )
+                        .uri("http://patient-service:8080")) // Correct base URI for patient-service
 
                 // Route configuration for appointment-service
                 .route("appointment-service", r -> r.path("/appointments/**")
-                        .filters(f -> f.filter(filter)
-                                .circuitBreaker(config -> config
-                                        .setName("appointmentServiceCircuitBreaker")
-                                        .setFallbackUri("forward:/fallback/appointment")))
-                        .uri("http://appointment-service:8080")) // Correct URI for appointment-service
+                        .filters(f -> f
+                                .circuitBreaker(c -> c.setName("appointmentServiceCircuitBreaker").setFallbackUri("forward:/fallback/appointment"))
+                                .filter(new RemoveDuplicateHeadersFilter()) // Optional: Remove duplicate headers
+                                .filter((exchange, chain) -> {
+                                    // Handle preflight OPTIONS requests
+                                    if (exchange.getRequest().getMethod() == HttpMethod.OPTIONS) {
+                                        exchange.getResponse().setStatusCode(HttpStatus.OK);
+                                        return exchange.getResponse().setComplete();
+                                    }
+                                    return chain.filter(exchange);
+                                })
+                        )
+                        .uri("http://appointment-service:8080")) // Correct base URI for appointment-service
 
+                // Route configuration for auth-service
                 .route("auth-service", r -> r.path("/api/auth/**")
-                .filters(f -> f
-                        .circuitBreaker(c -> c.setName("authCircuitBreaker").setFallbackUri("forward:/fallback/auth"))
-                        .filter(new RemoveDuplicateHeadersFilter()) // Optional: Remove duplicate headers
-                        .filter((exchange, chain) -> {
-                            // Handle preflight OPTIONS requests
-                            if (exchange.getRequest().getMethod() == HttpMethod.OPTIONS) {
-                                exchange.getResponse().setStatusCode(HttpStatus.OK);
-                                return exchange.getResponse().setComplete();
-                            }
-                            return chain.filter(exchange);
-                        })
-                )
-                .uri("http://auth-service:8080")) // Correct base URI for auth-service
+                        .filters(f -> f
+                                .circuitBreaker(c -> c.setName("authCircuitBreaker").setFallbackUri("forward:/fallback/auth"))
+                                .filter(new RemoveDuplicateHeadersFilter()) // Optional: Remove duplicate headers
+                                .filter((exchange, chain) -> {
+                                    // Handle preflight OPTIONS requests
+                                    if (exchange.getRequest().getMethod() == HttpMethod.OPTIONS) {
+                                        exchange.getResponse().setStatusCode(HttpStatus.OK);
+                                        return exchange.getResponse().setComplete();
+                                    }
+                                    return chain.filter(exchange);
+                                })
+                        )
+                        .uri("http://auth-service:8080")) // Correct base URI for auth-service
 
                 .build();
     }

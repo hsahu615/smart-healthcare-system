@@ -49,3 +49,5 @@ notification-service/mvnw.cmd
 
 notification-service/.mvn/wrapper/maven-wrapper.jar
 
+.env
+
