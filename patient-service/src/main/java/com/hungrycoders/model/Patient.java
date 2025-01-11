@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@Document(value = "patient")
+@Document(value = "patients")
 public class Patient {
 
     @Id

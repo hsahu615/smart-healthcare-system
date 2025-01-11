@@ -32,7 +32,7 @@ public class GatewayConfig {
 
         return builder.routes()
                 // Route configuration for doctor-service
-                .route("doctor-service", r -> r.path("/doctors/**")
+                .route("doctor-service", r -> r.path("/api/v1/doctor/**")
                         .filters(f -> f
                                 .circuitBreaker(c -> c.setName("doctorCircuitBreaker").setFallbackUri("forward:/fallback/doctor"))
                                 .filter(new RemoveDuplicateHeadersFilter()) // Optional: Remove duplicate headers
@@ -48,7 +48,7 @@ public class GatewayConfig {
                         .uri("http://doctor-service:8080")) // Correct base URI for doctor-service
 
                 // Route configuration for patient-service
-                .route("patient-service", r -> r.path("/patients/**")
+                .route("patient-service", r -> r.path("/api/v1/patient/**")
                         .filters(f -> f
                                 .circuitBreaker(c -> c.setName("patientCircuitBreaker").setFallbackUri("forward:/fallback/patient"))
                                 .filter(new RemoveDuplicateHeadersFilter()) // Optional: Remove duplicate headers
@@ -64,7 +64,7 @@ public class GatewayConfig {
                         .uri("http://patient-service:8080")) // Correct base URI for patient-service
 
                 // Route configuration for appointment-service
-                .route("appointment-service", r -> r.path("/appointments/**")
+                .route("appointment-service", r -> r.path("/api/v1/appointments/**")
                         .filters(f -> f
                                 .circuitBreaker(c -> c.setName("appointmentServiceCircuitBreaker").setFallbackUri("forward:/fallback/appointment"))
                                 .filter(new RemoveDuplicateHeadersFilter()) // Optional: Remove duplicate headers

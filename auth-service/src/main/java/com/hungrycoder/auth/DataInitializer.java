@@ -12,10 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class DataInitializer {
@@ -70,14 +67,17 @@ public class DataInitializer {
                     .append("phone", "123456789")
                     .append("speciality", "Gynic, General Medicine")
                     .append("yearsOfExperience", 4)
-                    .append("status", "Available");
+                    .append("status", "AVAILABLE")
+                    .append("_id", UUID.randomUUID().toString());
 
             // Insert into Patients collection
             Document patient = new Document()
                     .append("firstName", "Sample")
                     .append("lastName", "Patient")
                     .append("email", "patienthungrycoders@gmail.com")
-                    .append("phone", "123456789");
+                    .append("phone", "123456789")
+                    .append("age", 30)
+                    .append("_id", UUID.randomUUID().toString());
 
             mongoTemplate.insert(doctor, "doctors");
             mongoTemplate.insert(patient, "patients");
