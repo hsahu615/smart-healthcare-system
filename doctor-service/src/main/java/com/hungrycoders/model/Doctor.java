@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
-@Document(value = "doctor")
+@Document(value = "doctors")
 public class Doctor {
 
     @Id
