@@ -3,15 +3,15 @@ spring:
     name: notification-service
   kafka:
     auto-offset-reset: latest
-    bootstrap-servers: localhost:9092
-    group-id: appointment-notifications-group
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER}
+    group-id: ${KAFKA_GROUP_ID}
     topic:
-      name: appointment-notifications
+      name: ${KAFKA_TOPIC}
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: noreplyhungrycoders@gmail.com
-    password: aorykxbxzjlrdpot
+    host: ${MAIL_SERVER_HOST}
+    port: ${MAIL_SERVER_PORT}
+    username: ${MAIL_SERVER_USERNAME}
+    password: ${MAIL_SERVER_PASSWORD}
     properties:
       mail:
         smtp:
@@ -19,4 +19,4 @@ spring:
           starttls:
             enable: true
 server:
-  port: 8083
+  port: 8080

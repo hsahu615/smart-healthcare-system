@@ -38,7 +38,7 @@ COPY --chown=1000:1000 target/doctor-service-0.0.1-SNAPSHOT.jar /app/app.jar
 WORKDIR /app
 
 # Expose the application port
-EXPOSE 8081
+EXPOSE 8080
 
 # Define the entry point
 ENTRYPOINT [ "/jre/bin/java", "-Dspring.profiles.active=prod", "-jar", "/app/app.jar" ]

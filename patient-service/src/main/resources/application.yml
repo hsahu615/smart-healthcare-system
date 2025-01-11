@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: patient-service
+
+  data:
+    mongodb:
+      uri: ${MONGO_URI}
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+        servlet: DEBUG
+
+server:
+  port: ${PATIENT_SERVICE_PORT:8080}
