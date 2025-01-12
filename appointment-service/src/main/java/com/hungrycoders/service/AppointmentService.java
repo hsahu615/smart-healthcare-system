@@ -8,15 +8,25 @@ import com.hungrycoders.model.AppointmentStatus;
 import com.hungrycoders.model.Doctor;
 import com.hungrycoders.model.Patient;
 import com.hungrycoders.payload.request.AppointmentRequest;
+import com.hungrycoders.payload.response.GenericResponse;
 import com.hungrycoders.repository.AppointmentRepo;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Service class to handle appointment-related business logic.
@@ -46,6 +56,7 @@ public class AppointmentService {
     @Value("${spring.kafka.producer.topic}")
     private String topicName;
 
+    private static final Logger logger = LoggerFactory.getLogger(AppointmentService.class);
     /**
      * Books a new appointment by validating doctor and patient information.
      *
@@ -54,14 +65,23 @@ public class AppointmentService {
      */
     public String bookAppointment(AppointmentRequest appointment) {
         try {
+
+            // Serialize Appointment object to JSON
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+
             // Fetch and validate doctor details
             Doctor doctor = fetchDoctorDetails(appointment.getDoctorId().toString());
+            logger.info("Fetched doctor details inside book appointment: {}", objectMapper.writeValueAsString(doctor));
 
             // Fetch and validate patient details
             Patient patient = fetchPatientDetails(appointment.getPatientId().toString());
+            logger.info("Fetched patient details inside book appointment: {}", objectMapper.writeValueAsString(patient));
 
             // Create and save the appointment
+            UUID generatedId = UUID.randomUUID();
             Appointment newAppointment = new Appointment();
+            newAppointment.setId(generatedId);
             newAppointment.setDoctor(doctor);
             newAppointment.setPatient(patient);
             newAppointment.setAppointmentTime(appointment.getAppointmentTime());
@@ -69,14 +89,30 @@ public class AppointmentService {
             newAppointment.setNotes(appointment.getNotes());
             newAppointment.setStatus(AppointmentStatus.PENDING);
 
-            String appointmentId = appointmentRepository.save(newAppointment).getId();
+            String appointmentId = String.valueOf(appointmentRepository.save(newAppointment).getId());
 
-            // Serialize Appointment object to JSON
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.registerModule(new JavaTimeModule());
+
             String appointmentJson = objectMapper.writeValueAsString(newAppointment);
             // send message to kafka
-            kafkaTemplate.send(topicName, appointmentJson);
+            // Send message to Kafka and handle the callback
+            // Send the message to Kafka and get a CompletableFuture
+            CompletableFuture<SendResult<String, String>> completableFuture = kafkaTemplate.send(topicName, appointmentJson);
+
+            // Add callbacks to handle success and failure
+            completableFuture.whenComplete((result, exception) -> {
+                if (exception == null) {
+                    // Success case
+                    RecordMetadata metadata = result.getRecordMetadata();
+                    logger.info("Message sent successfully to topic: {}", topicName);
+                    logger.info("Partition: {}, Offset: {}", metadata.partition(), metadata.offset());
+                } else {
+                    // Failure case
+                    logger.error("Failed to send message to topic: {}", topicName);
+                    logger.error(exception.getMessage());
+//                    exception.printStackTrace();
+                }
+            });
+
             return appointmentId;
         } catch (Exception e) {
             throw new ResourceNotFoundException("Error booking appointment: " + e.getMessage());
@@ -122,7 +158,7 @@ public class AppointmentService {
     public String updateAppointment(AppointmentRequest appointment) {
         try {
             // Find the existing appointment
-            Appointment existingAppointment = appointmentRepository.findById(appointment.getId())
+            Appointment existingAppointment = appointmentRepository.findById(UUID.fromString(appointment.getId()))
                     .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointment.getId()));
 
             // Fetch and validate doctor details
@@ -145,7 +181,7 @@ public class AppointmentService {
             existingAppointment.setDoctorComments(appointment.getDoctorComments());
             existingAppointment.setStatus(AppointmentStatus.fromValue(appointment.getStatus()));
 
-            return appointmentRepository.save(existingAppointment).getId();
+            return String.valueOf(appointmentRepository.save(existingAppointment).getId());
         } catch (Exception e) {
             throw new ResourceNotFoundException("Error updating appointment: " + e.getMessage());
         }
@@ -166,12 +202,21 @@ public class AppointmentService {
             );
         }
 
-        // Actual call in non-development environments
-        Doctor doctor = restTemplate.getForObject(doctorServiceUrl + "/" + doctorId, Doctor.class);
-        if (doctor == null) {
-            throw new ResourceNotFoundException("Doctor not found with ID: " + doctorId);
+        ResponseEntity<GenericResponse<Doctor>> responseEntity = restTemplate.exchange(
+                doctorServiceUrl + "/" + doctorId,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<GenericResponse<Doctor>>() {}
+        );
+
+        GenericResponse<Doctor> getDoctorResponse = responseEntity.getBody();
+
+        if (getDoctorResponse != null && getDoctorResponse.getData() != null) {
+            return getDoctorResponse.getData();
         }
-        return doctor;
+
+        throw new ResourceNotFoundException("Doctor not found with ID: " + doctorId);
+
     }
 
     private Patient fetchPatientDetails(String patientId) {
@@ -188,11 +233,20 @@ public class AppointmentService {
         }
 
         // Actual call in non-development environments
-        Patient patient = restTemplate.getForObject(patientServiceUrl + "/" + patientId, Patient.class);
-        if (patient == null) {
-            throw new ResourceNotFoundException("Patient not found with ID: " + patientId);
+        ResponseEntity<GenericResponse<Patient>> responseEntity = restTemplate.exchange(
+                patientServiceUrl + "/" + patientId,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<GenericResponse<Patient>>() {}
+        );
+
+        GenericResponse<Patient> getDoctorResponse = responseEntity.getBody();
+
+        if (getDoctorResponse != null && getDoctorResponse.getData() != null) {
+            return getDoctorResponse.getData();
         }
-        return patient;
+
+        throw new ResourceNotFoundException("Doctor not found with ID: " + patientId);
     }
 
     private boolean isDevelopmentEnvironment() {
