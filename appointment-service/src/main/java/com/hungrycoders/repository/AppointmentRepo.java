@@ -6,11 +6,12 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Repository interface for managing appointments in the database.
  */
-public interface AppointmentRepo extends MongoRepository<Appointment, String> {
+public interface AppointmentRepo extends MongoRepository<Appointment, UUID> {
 
     /**
      * Finds appointments by doctor ID, sorted as specified.

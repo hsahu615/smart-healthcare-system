@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.FieldType;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Represents an appointment entity with details about doctor, patient, and status.
@@ -23,7 +24,7 @@ public class Appointment {
 
     @Id
     @Field(targetType = FieldType.STRING)
-    private String id;
+    private UUID id;
 
     private Patient patient;
     private Doctor doctor;
