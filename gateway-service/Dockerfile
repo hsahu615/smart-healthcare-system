@@ -1,6 +1,19 @@
-# Stage 1: Use an official Maven image as the base image
-FROM amazoncorretto:21-alpine3.18 AS corretto-jdk
+# Stage 1: Build the Spring Boot application
+FROM maven:3.9.4-eclipse-temurin-21-alpine AS build
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the Maven files for dependency resolution
+COPY pom.xml ./
+COPY src ./src
+
+# Run Maven clean install to build the application JAR
+RUN mvn clean install -DskipTests
+
 # Stage 2: Build the custom JRE
+FROM amazoncorretto:21-alpine3.18 AS corretto-jdk
+
 # Install necessary tools for `jlink`
 RUN apk add --no-cache binutils
 
@@ -33,8 +46,8 @@ RUN mkdir /app && \
     chown -R $APPLICATION_USER /app
 USER 1000
 
-# Copy the packaged Spring Boot JAR from the build stage
-COPY --chown=1000:1000 target/gateway-service-0.0.1-SNAPSHOT.jar /app/app.jar
+# Copy the packaged Spring Boot JAR from the Maven build stage
+COPY --from=build /app/target/gateway-service-0.0.1-SNAPSHOT.jar /app/app.jar
 WORKDIR /app
 
 # Expose the application port
