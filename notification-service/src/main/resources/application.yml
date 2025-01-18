@@ -1,16 +1,18 @@
 spring:
   application:
     name: notification-service
+
   kafka:
-    bootstrap-servers: kafka:9092
     consumer:
-      group-id: appointment-notifications-group
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER}
+      group-id: mygroupid
       auto-offset-reset: latest
-      enable-auto-commit: false
-      properties:
-        "max.poll.interval.ms": 300000
-    listener:
-      topic: appointment-notifications
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
+    topic:
+      name: ${KAFKA_TOPIC}
+
   mail:
     host: ${MAIL_SERVER_HOST}
     port: ${MAIL_SERVER_PORT}
@@ -22,5 +24,6 @@ spring:
           auth: true
           starttls:
             enable: true
+
 server:
   port: 8080

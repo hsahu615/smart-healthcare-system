@@ -12,32 +12,49 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.TopicPartition;
 import org.springframework.stereotype.Component;
 
+/**
+ * Kafka Consumer Listener to process messages from the Kafka topic.
+ */
 @Component
 public class KafkaConsumerListener {
 
-	final Logger logger = LoggerFactory.getLogger(getClass());
-	private final ObjectMapper objectMapper = new ObjectMapper();
+	// Logger for debugging and monitoring
+	private static final Logger logger = LoggerFactory.getLogger(KafkaConsumerListener.class);
 
+	// ObjectMapper for JSON serialization and deserialization
+	private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+	// Service for triggering email notifications
 	@Autowired
 	private EmailService emailService;
 
-//	@KafkaListener(
-//			topics = "${spring.kafka.topic.name}",
-//			groupId = "${spring.kafka.group-id}",
-//			partitions = "0")
-	@KafkaListener(
-			groupId = "${spring.kafka.consumer.group-id}",
-			topicPartitions = @TopicPartition(topic = "${spring.kafka.listener.topic}", partitions = "0")
-	)
-	public void listen(String message) throws JsonProcessingException {
-		// Deserialize the JSON message into an Appointment object
-		objectMapper.registerModule(new JavaTimeModule());
-		Appointment appointment = objectMapper.readValue(message, Appointment.class);
-		String appointmentJson = objectMapper.writeValueAsString(appointment);
-		// send email based on appointment status
-		emailService.triggerEmailNotification(appointment);
-		// Log the deserialized Appointment object
-		logger.info("Received Appointment | message: {}, json: {}", message, appointmentJson);
-	}
+	/**
+	 * Kafka listener method to process messages from the specified topic and partition.
+	 *
+	 * @param message JSON message received from the Kafka topic.
+	 */
+	@KafkaListener(topics = "#{'${spring.kafka.topic.name}'}")
+	public void listen(String message) {
+		try {
 
+			logger.info("Listening on topic: {}", "${spring.kafka.listener.topic}");
+
+			// Deserialize the JSON message into an Appointment object
+			Appointment appointment = objectMapper.readValue(message, Appointment.class);
+
+			// Log the deserialized Appointment object
+			logger.info("Received Appointment | rawMessage: {}, parsedJson: {}", message, appointment);
+
+			// Trigger email notifications based on appointment details
+			emailService.triggerEmailNotification(appointment);
+
+			logger.info("Email notification sent for Appointment ID: {}", appointment.getId());
+		} catch (JsonProcessingException e) {
+			// Handle JSON parsing errors
+			logger.error("Error deserializing message: {}", message, e);
+		} catch (Exception ex) {
+			// Catch any other unexpected exceptions
+			logger.error("Unexpected error while processing message: {}", message, ex);
+		}
+	}
 }

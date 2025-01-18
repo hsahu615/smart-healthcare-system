@@ -10,9 +10,13 @@ spring:
             uri: ${MONGO_URI}
 
     kafka:
-        bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER}
         producer:
-            topic: ${KAFKA_TOPIC}
+            bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER}
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+        topic:
+            name: ${KAFKA_TOPIC}
 
 logging:
     level:

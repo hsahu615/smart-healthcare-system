@@ -53,7 +53,7 @@ public class AppointmentService {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    @Value("${spring.kafka.producer.topic}")
+    @Value("${spring.kafka.topic.name}")
     private String topicName;
 
     private static final Logger logger = LoggerFactory.getLogger(AppointmentService.class);
