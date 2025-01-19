@@ -1,4 +1,17 @@
-# Stage 1: Build the custom JRE
+# Stage 1: Build the Spring Boot application
+FROM maven:3.9.4-eclipse-temurin-21-alpine AS build
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy only the necessary files for dependency resolution
+COPY pom.xml ./
+COPY src ./src
+
+# Run Maven clean install to build the application
+RUN mvn clean install -DskipTests
+
+# Stage 2: Build the custom JRE
 FROM amazoncorretto:21-alpine3.18 AS corretto-jdk
 
 # Install the necessary tools for using `jlink`
@@ -14,14 +27,14 @@ RUN $JAVA_HOME/bin/jlink \
     --compress=2 \
     --output /customjre
 
-# Stage 2: Create the final application image
+# Stage 3: Create the final application image
 FROM alpine:latest
 
 # Set environment variables for the custom JRE
 ENV JAVA_HOME=/jre
 ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
-# Copy the custom JRE built in the first stage into the application image
+# Copy the custom JRE built in the second stage into the application image
 COPY --from=corretto-jdk /customjre $JAVA_HOME
 
 # Add a non-root user to enhance security
@@ -33,8 +46,8 @@ RUN mkdir /app && \
     chown -R $APPLICATION_USER /app
 USER 1000
 
-# Copy the Spring Boot JAR into the application directory
-COPY target/auth-service-0.0.1-SNAPSHOT.jar /app/app.jar
+# Copy the Spring Boot JAR built in the first stage into the application directory
+COPY --from=build /app/target/auth-service-0.0.1-SNAPSHOT.jar /app/app.jar
 WORKDIR /app
 
 # Expose the port on which the application will run
