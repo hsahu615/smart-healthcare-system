@@ -4,31 +4,33 @@
 
     <!-- Parent POM to inherit common configurations -->
     <parent>
-        <groupId>com.hungrycoders</groupId>
-        <artifactId>smart-healthcare-system</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.0</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
+
 
     <!-- Project-specific identifiers -->
     <artifactId>doctor-service</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Doctor Service</name>
     <url>http://maven.apache.org</url>
 
     <!-- Project properties -->
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding> <!-- Encoding for source files -->
-        <java.version>17</java.version> <!-- Java version -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>17</java.version>
+        <lombok.version>1.18.34</lombok.version>
     </properties>
 
     <!-- Project dependencies -->
     <dependencies>
-        <!-- JUnit for testing -->
+        <!-- Spring Boot Starter Web -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>3.8.1</version>
-            <scope>test</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
         <!-- Spring Boot Starter for MongoDB integration -->
@@ -43,11 +45,18 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- Spring Boot Starter for Validation -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+
         <!-- Lombok to reduce boilerplate code -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.34</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -57,11 +66,12 @@
             <artifactId>jakarta.validation-api</artifactId>
         </dependency>
 
-        <!-- Spring Boot Starter for Validation -->
+        <!-- JUnit for testing -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-            <version>3.4.0</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -79,8 +89,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>${java.version}</source> <!-- Set source compatibility -->
-                    <target>${java.version}</target> <!-- Set target compatibility -->
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                     <annotationProcessorPaths>
                         <!-- Lombok Annotation Processor -->
                         <path>

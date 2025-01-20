@@ -142,6 +142,25 @@ services:
             - "9090:80" # Expose the React app on port 9090
         restart: always
 
+    admin-service:
+        build:
+            context: ./admin-service
+        container_name: admin-service
+        networks:
+            - app-network
+        depends_on:
+            - appointment-service
+            - auth-service
+            - doctor-service
+            - gateway-service
+            - notification-service
+            - patient-service
+        ports:
+            - "8082:8080"
+        environment:
+            - ADMIN_PANEL_SERVICE_PORT=8082
+        restart: always
+
 networks:
     app-network:
 
