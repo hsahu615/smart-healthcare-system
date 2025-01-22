@@ -13,6 +13,7 @@ const Appointments = () => {
     const [currentRole, setCurrentRole] = useState<any>("");
     const { setShowSpinner } = useContext(spinnerContext);
     const user: any = JSON.parse(localStorage.getItem("user") || "{}");
+    console.log(user);
 
     useEffect(() => {
         console.log("Component mounted. Fetching data...");
@@ -27,14 +28,19 @@ const Appointments = () => {
         setShowSpinner(true);
 
         if (role === "ROLE_PATIENT") {
+            console.log(user);
             if (user && user.id) {
                 console.log("Fetching appointments for patient...");
                 getAllAppointmentsByPatient(user.id)
                     .then((res: any) => {
+                        console.log(res);
                         setShowSpinner(false);
                         const aps = res?.data?.data || [];
                         console.log("Appointments fetched for patient:", aps);
-                        setAppointments(aps);
+                        console.log(JSON.parse(aps || "{}"));
+                        const aps1 = res?.data || [];
+                         console.log(JSON.parse(aps1 || "{}"));
+                        setAppointments(aps1);
                     })
                     .catch((err) => {
                         setShowSpinner(false);
