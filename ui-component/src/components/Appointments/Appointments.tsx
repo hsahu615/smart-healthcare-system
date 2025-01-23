@@ -35,12 +35,9 @@ const Appointments = () => {
                     .then((res: any) => {
                         console.log(res);
                         setShowSpinner(false);
-                        const aps = res?.data?.data || [];
+                        const aps = res?.data|| [];
                         console.log("Appointments fetched for patient:", aps);
-                        console.log(JSON.parse(aps || "{}"));
-                        const aps1 = res?.data || [];
-                         console.log(JSON.parse(aps1 || "{}"));
-                        setAppointments(aps1);
+                        setAppointments(aps);
                     })
                     .catch((err) => {
                         setShowSpinner(false);
@@ -56,7 +53,7 @@ const Appointments = () => {
                 getAllAppointmentsByDoctor(user.id)
                     .then((res: any) => {
                         setShowSpinner(false);
-                        const aps = res?.data?.data || [];
+                        const aps = res?.data || [];
                         console.log("Appointments fetched for doctor:", aps);
                         setAppointments(aps);
                     })

@@ -37,11 +37,13 @@ const AuthProvider = ({ children }: any) => {
         getDoctorByEmail(email).then((res) => {
           setUser(res?.data?.data);
           localStorage.setItem("user", JSON.stringify(res?.data?.data));
+          navigate("/");
         });
       } else if (userRole === "ROLE_PATIENT") {
         getPatientByEmail(email).then((res) => {
           setUser(res?.data?.data);
           localStorage.setItem("user", JSON.stringify(res?.data?.data));
+          navigate("/");
         });
       }
     } catch (e) {
@@ -54,10 +56,10 @@ const AuthProvider = ({ children }: any) => {
     setUserRole(res.roles[0]);
     setToken(res.token);
     setAuth(res);
+    fetchUser(res?.email);
     localStorage.setItem("jwt", res.token);
     localStorage.setItem("auth", JSON.stringify(res));
     localStorage.setItem("userRole", res.roles[0]);
-    navigate("/");
   };
 
   // Logout function to update states and delete details stored in localstorage (navigate back to login screen)
