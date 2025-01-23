@@ -60,7 +60,7 @@ const AuthProvider = ({ children }: any) => {
     localStorage.setItem("jwt", res.token);
     localStorage.setItem("auth", JSON.stringify(res));
     localStorage.setItem("userRole", res.roles[0]);
-    if(userRole === "ROLE_ADMIN") navigate("/");
+    if(res.roles[0] === "ROLE_ADMIN") navigate("/");
   };
 
   // Logout function to update states and delete details stored in localstorage (navigate back to login screen)
