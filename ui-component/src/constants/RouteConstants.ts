@@ -13,7 +13,7 @@ export const GET_PATIENT_BY_EMAIL_PROD = "http://localhost:8080/api/v1/patient/e
 export const GET_ALL_APPOINTMENTS_PROD = "http://localhost:8080/api/v1/appointments/all";
 export const GET_ALL_APPOINTMENTS_BY_DOCTOR_PROD = "http://localhost:8080/api/v1/appointments/doctor";
 export const GET_ALL_APPOINTMENTS_BY_PATIENT_PROD = "http://localhost:8080/api/v1/appointments/patient";
-export const UPDATE_APPOINTMENT_PROD = "http://localhost:8080/api/v1/appointments/";
+export const UPDATE_APPOINTMENT_PROD = "http://localhost:8080/api/v1/appointments";
 export const UPDATE_DOCTOR_PROD = "http://localhost:8080/api/v1/doctor";
 
 // Development constants
@@ -31,5 +31,5 @@ export const GET_PATIENT_BY_EMAIL_DEV = "http://localhost:8082/api/v1/patient/em
 export const GET_ALL_APPOINTMENTS_DEV = "http://localhost:8080/api/v1/appointments/all";
 export const GET_ALL_APPOINTMENTS_BY_DOCTOR_DEV = "http://localhost:8080/api/v1/appointments/doctor";
 export const GET_ALL_APPOINTMENTS_BY_PATIENT_DEV = "http://localhost:8080/api/v1/appointments/patient";
-export const UPDATE_APPOINTMENT_DEV = "http://localhost:8080/api/v1/appointments/";
+export const UPDATE_APPOINTMENT_DEV = "http://localhost:8080/api/v1/appointments";
 export const UPDATE_DOCTOR_DEV = "http://localhost:8081/api/v1/doctor";

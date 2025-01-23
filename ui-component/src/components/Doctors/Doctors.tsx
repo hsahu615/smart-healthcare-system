@@ -50,7 +50,7 @@ const Doctors = () => {
     getAllAppointmentsByDoctor(doctorId)
       .then((res: any) => {
         setShowSpinner(false);
-        const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+        const aps = res?.data === undefined ? [] : res?.data;
         setAppointments(aps);
       })
       .catch((err) => {

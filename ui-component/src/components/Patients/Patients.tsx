@@ -47,7 +47,7 @@ const Patients = () => {
       .then((res: any) => {
         setShowSpinner(false); // Hide the spinner once data is received
         // Extract appointment data or set an empty array if no data
-        const aps = res?.data?.data === undefined ? [] : res?.data?.data;
+        const aps = res?.data === undefined ? [] : res?.data;
         setAppointments(aps);
       })
       .catch((err) => {
