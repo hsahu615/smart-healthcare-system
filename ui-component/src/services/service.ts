@@ -144,7 +144,7 @@ export async function updateAppointment(appointment) {
 
 export async function updateDoctor(doctor, id) {
 	try {
-		const res = await axiosInstance.patch(`${UPDATE_DOCTOR_PROD}/${id}`, doctor, { method: "PUT" });
+		const res = await axiosInstance.put(`${UPDATE_DOCTOR_PROD}/${id}`, doctor, { method: "PUT" });
 		return res;
 	} catch (e) {
 		console.log("error");
