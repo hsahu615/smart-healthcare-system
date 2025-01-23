@@ -72,7 +72,7 @@ public class DoctorController {
         }
     }
 
-    @PostMapping("/")
+    @PostMapping
     public ResponseEntity<?> saveDoctor(@Valid @RequestBody com.hungrycoders.payload.request.Doctor doctor) throws Exception {
         try {
             Doctor savedDoctor = doctorService.addDoctor(doctor);
