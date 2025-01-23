@@ -84,7 +84,7 @@ public class DoctorController {
 
     }
 
-    @PatchMapping("/{id}")
+    @PutMapping("/{id}")
     public ResponseEntity<?> updateDoctor(@Valid @RequestBody com.hungrycoders.payload.request.Doctor doctor, @PathVariable String id) throws Exception {
         try {
             Doctor updatedDoctor = doctorService.updateDoctorById(id, doctor);
