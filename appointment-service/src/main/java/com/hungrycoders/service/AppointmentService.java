@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -162,20 +163,46 @@ public class AppointmentService {
                     .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointment.getId()));
 
             // Fetch and validate doctor details
-            Doctor doctor = restTemplate.getForObject(doctorServiceUrl + "/" + appointment.getDoctorId(), Doctor.class);
-            if (doctor == null) {
+            Map<String, Object> doctor = restTemplate.getForObject(doctorServiceUrl + "/" + appointment.getDoctorId(), Map.class);
+            if (doctor == null || doctor.isEmpty()) {
                 throw new ResourceNotFoundException("Doctor not found with ID: " + appointment.getDoctorId());
             }
 
             // Fetch and validate patient details
-            Patient patient = restTemplate.getForObject(patientServiceUrl + "/" + appointment.getPatientId(), Patient.class);
-            if (patient == null) {
+            Map<String, Object>  patient = restTemplate.getForObject(patientServiceUrl + "/" + appointment.getPatientId(), Map.class);
+            if (patient == null || patient.isEmpty()) {
                 throw new ResourceNotFoundException("Patient not found with ID: " + appointment.getPatientId());
             }
 
+            Map<String, Object> doctorData = (Map<String, Object>) doctor.get("data");
+
+            // Manually create a Doctor object from the Map
+            Doctor doctor1 = new Doctor();
+            doctor1.setId((String) doctorData.get("id"));
+            doctor1.setFirstName((String) doctorData.get("firstName"));
+            doctor1.setLastName((String) doctorData.get("lastName"));
+            doctor1.setEmail((String) doctorData.get("email"));
+            doctor1.setPhone((String) doctorData.get("phone"));
+            doctor1.setSpeciality((String) doctorData.get("speciality"));
+            doctor1.setYearsOfExperience((Integer) doctorData.get("yearsOfExperience"));
+            doctor1.setStatus((String) doctorData.get("status"));
+
+
+            Map<String, Object> patientData = (Map<String, Object>) patient.get("data");
+
+            // Manually create a Doctor object from the Map
+            Patient patient1 = new Patient();
+            patient1.setId((String) patientData.get("id"));
+            patient1.setFirstName((String) patientData.get("firstName"));
+            patient1.setLastName((String) patientData.get("lastName"));
+            patient1.setEmail((String) patientData.get("email"));
+            patient1.setPhone((String) patientData.get("phone"));
+            patient1.setAge((Integer) patientData.get("age"));
+
+
             // Update appointment details
-            existingAppointment.setDoctor(doctor);
-            existingAppointment.setPatient(patient);
+            existingAppointment.setDoctor(doctor1);
+            existingAppointment.setPatient(patient1);
             existingAppointment.setAppointmentTime(appointment.getAppointmentTime());
             existingAppointment.setNotes(appointment.getNotes());
             existingAppointment.setDoctorComments(appointment.getDoctorComments());
