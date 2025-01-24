@@ -11,8 +11,8 @@ services:
         environment:
             - MONGO_INITDB_ROOT_USERNAME=root
             - MONGO_INITDB_ROOT_PASSWORD=rootpassword
-        volumes:
-            - ./mongo-data:/data/db
+        # volumes:
+        #     - ./mongo-data:/data/db
 
     gateway-service:
         build:
@@ -43,7 +43,7 @@ services:
 
     doctor-service:
         build:
-            context:  ./doctor-service
+            context: ./doctor-service
         container_name: doctor-service
         networks:
             - app-network
@@ -127,7 +127,6 @@ services:
             - KAFKA_KRAFT_CLUSTER_ID=MkU3OEVBNTcwNTJENDM2Qk
         networks:
             - app-network
-
 
     ui-service:
         build:
