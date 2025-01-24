@@ -1,15 +1,6 @@
 # healthcare-client
 
-A React-based client-side application for a smart healthcare system. This project provides a user-friendly interface to manage patients, appointments, and more.
-
-## Table of Contents
-
-- [Features](#features)
-- [Getting Started](#getting-started)
-- [Scripts](#scripts)
-- [Project Structure](#project-structure)
-- [Dependencies](#dependencies)
-
+A React-based client-side application for a smart healthcare system. This project provides a user-friendly interface to manage patients, appointments, and more
 ## Features
 
 - User authentication and protected routes.
@@ -25,89 +16,41 @@ Ensure you have the following installed:
 - Node.js
 - npm or yarn
 
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/hsahu615/smart-healthcare-system
-   ```
-2. Navigate to the project directory:
-   ```bash
-   cd smart-healthcare-system\ui-component
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-### Running the Project
-
-Start the development server:
-
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:5173`.
-
-### Building for Production
-
-To create a production build:
-
-```bash
-npm run build
-```
-
-The build files will be in the `dist` folder.
-
 ## Scripts
 
 - `dev`: Start the development server.
 - `build`: Build the project for production.
 
-## Project Structure
+---
 
-```
-ui-component/
-├── public/                # Static assets
-├── src/                   # Source code
-│   ├── auth/              # Authentication context and provider
-│   │   ├── AuthContext.ts
-│   │   └── AuthProvider.tsx
-│   ├── components/        # React Components
-│   │   ├── Appointments/  # Appointment Cards
-│   │   │   └── Appointments.tsx
-│   │   ├── Doctors/       # Doctor Cards
-│   │   │   ├── Doctors.tsx
-│   │   │   └── Doctors.css
-│   │   ├── Navbar/        # Navigation Links and Logo
-│   │   │   ├── Navbar.tsx
-│   │   │   └── Navbar.css
-│   │   ├── Patients/      # Patient Cards
-│   │   │   ├── Patients.tsx
-│   │   │   └── Patients.css
-│   │   ├── ProtectedRoute/ # Route protection components
-│   │   │   └── ProtectedRoute.tsx
-│   │   └── Spinner/       # Loading spinner components
-│   │       └── SpinnerProvider.tsx
-│   ├── pages/             # Application pages
-│   │   ├── AddAppointment/
-│   │   │   └── AddAppointment.jsx # Page to Add a Appointment
-│   │   ├── AddDoctor/
-│   │   │   └── AddDoctor.jsx # Page to Add a Doctor
-│   │   ├── Home/
-│   │   │   ├── Home.tsx # Home Page with Appointment/Doctor/Patient section
-│   │   │   └── Home.css
-│   │   ├── Login/
-│   │   │   └── Login.tsx # Login Page
-│   │   └── Unauthorized.tsx # Page on hitting unauthorized route
-│   ├── App.jsx            # Root component
-│   └── main.jsx           # Entry point
-├── package.json           # Project metadata and scripts
-├── vite.config.js         # Vite configuration
-├── Dockerfile             # Docker configuration (if applicable)
-└── README.md              # Project documentation
-```
+## API Integrations
+
+The UI Component interacts with the following APIs:
+
+1. **Auth Service**:
+   - **Signin:** `/api/auth/signin`
+
+2. **Doctor Service**:
+   - **Add Doctor:** `/api/v1/doctor`
+   - **Get All Doctors:** `/api/v1/doctor/all`
+   - **Get Doctor by ID:** `/api/v1/doctor/{id}`
+   - **Update Doctor:** `/api/v1/doctor/{id}`
+   - **Delete Doctor:** `/api/v1/doctor/{id}`
+
+3. **Patient Service**:
+   - **Get All Patients:** `/api/v1/patient/all`
+   - **Get Patient by Email:** `/api/v1/patient/email/{email}`
+   - **Delete Patient:** `/api/v1/patient/{id}`
+
+4. **Appointment Service**:
+   - **Add Appointment:** `/api/v1/appointments/create`
+   - **Get All Appointments:** `/api/v1/appointments/all`
+   - **Get Appointments by Doctor ID:** `/api/v1/appointments/doctor/{doctorId}`
+   - **Get Appointments by Patient ID:** `/api/v1/appointments/patient/{patientId}`
+   - **Update Appointment:** `/api/v1/appointments`
+   - **Delete Appointment:** `/api/v1/appointments/{id}`
+
+---
 
 ## Dependencies
 

@@ -1,6 +1,23 @@
+
 # Auth Service
 
 Auth Service provides authentication and authorization capabilities for your application. It includes APIs for user registration (`signup`) and login (`signin`), generating JWT tokens for secure communication between clients and services.
+
+---
+
+## How to Run
+
+### Prerequisites
+1. Install Java 17 and Maven.
+2. Install Docker Desktop and Docker Compose.
+3. Install MongoDB Compass to view data.
+
+### Steps to Run
+
+Run with Docker Compose:
+
+Build and start all services using Docker Compose.
+Follow the instructions in the main README.md file in the root folder.
 
 ---
 
@@ -45,32 +62,17 @@ Auth Service provides authentication and authorization capabilities for your app
         ]
     }
     ```
+
+## Data Initialization
+
+### DataInitializer Class
+
+The DataInitializer class seeds initial data such as roles and sample users into MongoDB.
+You must update the data and email IDs in this class before running the project for testing.
+
 ---
 
-## MongoDB Setup in Docker
+## Additional Notes
 
-### Run MongoDB
-To start MongoDB as a Docker container:
-```bash
-docker run -d \
-  --name mongodb \
-  -p 27017:27017 \
-  -e MONGO_INITDB_ROOT_USERNAME=root \
-  -e MONGO_INITDB_ROOT_PASSWORD=rootpassword \
-  mongo:6.0
-  ```
-
-### Check MongoDB collections
-- docker exec -it mongodb mongosh
-- use admin
-- db.auth("root", "rootpassword")
-- use healthcare
-- show collections
-- db.roles.find()
-
-## Running the Project
-
-To run this project, use the following commands in your terminal or command prompt:
-```bash
-mvn install
-mvn spring-boot:run
+- Ensure email functionality by configuring `MAIL_SERVER_USERNAME` and `MAIL_SERVER_PASSWORD` in the `docker-compose.yml`.
+- All services, including the `auth-service`, are registered in Spring Boot Admin for centralized monitoring.
