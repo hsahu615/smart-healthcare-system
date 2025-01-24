@@ -32,4 +32,5 @@ public class Appointment {
     private AppointmentStatus status; // PENDING, CONFIRMED, REJECTED, COMPLETED
     private String notes;
     private String doctorComments;
+
 }

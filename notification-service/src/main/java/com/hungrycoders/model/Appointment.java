@@ -17,7 +17,6 @@ import java.time.LocalDateTime;
 @Setter
 public class Appointment {
 
-
     private String id;
     private Patient patient;
     private Doctor doctor;
@@ -25,5 +24,4 @@ public class Appointment {
     private AppointmentStatus status; // PENDING, CONFIRMED, REJECTED, COMPLETED
     private String notes;
     private String doctorComments;
-
 }
