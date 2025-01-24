@@ -94,26 +94,7 @@ public class AppointmentService {
 
 
             String appointmentJson = objectMapper.writeValueAsString(newAppointment);
-            // send message to kafka
-            // Send message to Kafka and handle the callback
-            // Send the message to Kafka and get a CompletableFuture
-            CompletableFuture<SendResult<String, String>> completableFuture = kafkaTemplate.send(topicName, appointmentJson);
-
-            // Add callbacks to handle success and failure
-            completableFuture.whenComplete((result, exception) -> {
-                if (exception == null) {
-                    // Success case
-                    RecordMetadata metadata = result.getRecordMetadata();
-                    logger.info("Message sent successfully to topic: {}", topicName);
-                    logger.info("Partition: {}, Offset: {}", metadata.partition(), metadata.offset());
-                } else {
-                    // Failure case
-                    logger.error("Failed to send message to topic: {}", topicName);
-                    logger.error(exception.getMessage());
-//                    exception.printStackTrace();
-                }
-            });
-
+            sendEventToKafka(appointmentJson);
             return appointmentId;
         } catch (Exception e) {
             throw new ResourceNotFoundException("Error booking appointment: " + e.getMessage());
@@ -208,10 +189,42 @@ public class AppointmentService {
             existingAppointment.setDoctorComments(appointment.getDoctorComments());
             existingAppointment.setStatus(AppointmentStatus.fromValue(appointment.getStatus()));
 
-            return String.valueOf(appointmentRepository.save(existingAppointment).getId());
+            String idResponse = String.valueOf(appointmentRepository.save(existingAppointment).getId());
+
+            // Serialize Appointment object to JSON
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            String appointmentJson = objectMapper.writeValueAsString(existingAppointment);
+            sendEventToKafka(appointmentJson);
+
+            return idResponse;
+
+
         } catch (Exception e) {
             throw new ResourceNotFoundException("Error updating appointment: " + e.getMessage());
         }
+    }
+
+    private void sendEventToKafka(String appointmentJson) {
+        // send message to kafka
+        // Send message to Kafka and handle the callback
+        // Send the message to Kafka and get a CompletableFuture
+        CompletableFuture<SendResult<String, String>> completableFuture = kafkaTemplate.send(topicName, appointmentJson);
+
+        // Add callbacks to handle success and failure
+        completableFuture.whenComplete((result, exception) -> {
+            if (exception == null) {
+                // Success case
+                RecordMetadata metadata = result.getRecordMetadata();
+                logger.info("Message sent successfully to topic: {}", topicName);
+                logger.info("Partition: {}, Offset: {}", metadata.partition(), metadata.offset());
+            } else {
+                // Failure case
+                logger.error("Failed to send message to topic: {}", topicName);
+                logger.error(exception.getMessage());
+//                    exception.printStackTrace();
+            }
+        });
     }
 
     private Doctor fetchDoctorDetails(String doctorId) {
