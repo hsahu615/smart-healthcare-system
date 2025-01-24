@@ -2,6 +2,15 @@ spring:
   application:
     name: patient-service
 
+  boot:
+    admin:
+      client:
+        enabled: true
+        instance:
+          name: Patient Service
+          service-url: http://patient-service:8080
+        url: http://admin-service:8080
+        auto-registration: true
   data:
     mongodb:
       uri: ${MONGO_URI}
@@ -12,6 +21,14 @@ logging:
       springframework:
         web: DEBUG
         servlet: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      enable:
+        include: health
 
 server:
   port: ${PATIENT_SERVICE_PORT:8080}

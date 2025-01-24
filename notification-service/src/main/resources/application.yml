@@ -2,6 +2,16 @@ spring:
   application:
     name: notification-service
 
+  boot:
+    admin:
+      client:
+        enabled: true
+        instance:
+          name: Notification Service
+          service-url: http://notification-service:8080
+        url: http://admin-service:8080
+        auto-registration: true
+
   kafka:
     consumer:
       bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVER}
@@ -24,6 +34,14 @@ spring:
           auth: true
           starttls:
             enable: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+      enable:
+        include: health
 
 server:
   port: 8080

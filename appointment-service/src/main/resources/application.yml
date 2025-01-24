@@ -5,6 +5,16 @@ spring:
     application:
         name: appointment-service
 
+    boot:
+        admin:
+            client:
+                enabled: true
+                instance:
+                    name: Appointment Service
+                    service-url: http://appointment-service:8080
+                url: http://admin-service:8080
+                auto-registration: true
+
     data:
         mongodb:
             uri: ${MONGO_URI}
@@ -29,6 +39,14 @@ logging:
                     clients:
                         producer: DEBUG
 
+management:
+    endpoints:
+        web:
+            exposure:
+                include: "*"
+            enable:
+                include: health
+
 server:
     port: ${APPOINTMENT_SERVICE_PORT:8080}
 
@@ -42,4 +60,3 @@ patient:
     data:
         mongodb:
             uri: ${MONGO_URI}
-
