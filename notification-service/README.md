@@ -45,6 +45,8 @@ The `EmailService` sends emails based on the status of the appointment:
       
       Your appointment with Patient: John Doe is currently pending approval.
       Appointment Date and Time: 24 January 2025, 03:00 PM
+      Notes: eye pain
+      Doctor's Comments: N/A
       
       Thank you,
       Team HungryCoders
@@ -60,6 +62,8 @@ The `EmailService` sends emails based on the status of the appointment:
       
       Your appointment with Doctor: Dr. Smith has been confirmed.
       Appointment Date and Time: 24 January 2025, 03:00 PM
+      Notes: eye pain
+      Doctor's Comments: N/A
       
       Thank you,
       Team HungryCoders
@@ -75,6 +79,8 @@ The `EmailService` sends emails based on the status of the appointment:
       
       We regret to inform you that your appointment with Doctor: Dr. Smith has been rejected.
       Please contact support for further assistance.
+      Notes: eye pain
+      Doctor's Comments: N/A
       
       Thank you,
       Team HungryCoders
@@ -90,6 +96,8 @@ The `EmailService` sends emails based on the status of the appointment:
       
       Your appointment with Doctor: Dr. Smith has been updated.
       Appointment Date and Time: 25 January 2025, 04:00 PM
+      Notes: eye pain
+      Doctor's Comments: eye drop 3 times a day
       
       Thank you,
       Team HungryCoders
