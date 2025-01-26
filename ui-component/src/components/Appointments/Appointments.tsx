@@ -148,6 +148,7 @@ const Appointments = () => {
         console.log("Updating appointment after checkup:", appointment);
         let currComment = appointment.doctorComments;
         appointment.doctorComments = e.target[3].value;
+        appointment.status = "COMPLETED";
         setShowSpinner(true);
         updateAppointment(appointment)
             .then((res: any) => {
@@ -195,7 +196,15 @@ const Appointments = () => {
                     key={appointment.id}
                     className="card my-2 w-100"
                     style={{
-                        border: isPast(appointment.appointmentTime) ? "2px solid blue" : appointment.status.toLowerCase() === "pending" ? "2px solid yellow" : appointment.status.toLowerCase() === "confirmed" ? "2px solid green" : "2px solid red",
+                      border: appointment.status && appointment.status.toLowerCase() === "pending"
+                          ? "2px solid yellow"
+                          : appointment.status && appointment.status.toLowerCase() === "confirmed"
+                          ? "2px solid purple"
+                          : appointment.status && appointment.status.toLowerCase() === "completed"
+                          ? "2px solid green"
+                          : isPast(appointment.appointmentTime)
+                          ? "2px solid blue"
+                          : "2px solid red",
                     }}
                 >
                     <div className="card-body">
